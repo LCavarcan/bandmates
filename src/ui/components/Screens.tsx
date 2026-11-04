@@ -56,7 +56,9 @@ export function TitleScreen({
 }
 
 export function SeasonEnd({ state, onNew, onMenu }: { state: GameState; onNew: () => void; onMenu: () => void }) {
-  const best = [...state.songs].sort((a, b) => b.quality + b.originality - (a.quality + a.originality))[0];
+  const rank = (s: GameState['songs'][number]) => s.score ?? (s.quality + s.originality) / 2;
+  const best = [...state.songs].sort((a, b) => rank(b) - rank(a))[0];
+  const released = state.songs.filter((s) => s.status === 'lancada').length;
   return (
     <section className="season-end">
       <p className="eyebrow">Fim da temporada</p>
@@ -65,11 +67,12 @@ export function SeasonEnd({ state, onNew, onMenu }: { state: GameState; onNew: (
         <div><strong>{state.fans}</strong><span>fãs</span></div>
         <div><strong>{fmtMoney(state.money)}</strong><span>em caixa</span></div>
         <div><strong>{state.reputation}</strong><span>reputação</span></div>
-        <div><strong>{state.songs.length}</strong><span>músicas</span></div>
+        <div><strong>{state.songs.length}</strong><span>músicas ({released} lançadas)</span></div>
       </div>
       {best && (
         <p>
-          A música mais marcante foi <strong>“{best.title}”</strong> (qualidade {best.quality}, originalidade {best.originality}).
+          A música mais marcante foi <strong>“{best.title}”</strong>
+          {best.score !== null ? ` (nota ${best.score})` : ` (qualidade ${best.quality}, originalidade ${best.originality})`}.
         </p>
       )}
       <div className="season-end__band">

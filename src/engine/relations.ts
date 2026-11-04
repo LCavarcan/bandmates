@@ -58,8 +58,8 @@ export function pairInteraction(
     return { tone: 'harmonia', delta: { afinidade: 4, confianca: 2 } };
   }
 
-  // Perfeccionismo contra impulsividade gera atrito no trabalho técnico.
-  if (perfVsImpulse && (activity === 'ensaiar' || activity === 'compor')) {
+  // Perfeccionismo contra impulsividade gera atrito no trabalho técnico (ensaio, composição, gravação).
+  if (perfVsImpulse && (activity === 'ensaiar' || activity === 'compor' || activity === 'gravar')) {
     if (rel.respeito >= 35) {
       // Com respeito suficiente, o atrito vira aprendizado.
       return { tone: 'faisca', delta: { respeito: 3, rivalidade: 1 } };

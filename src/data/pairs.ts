@@ -41,6 +41,22 @@ export const PAIR_LINES: Record<ActivityId, Record<PairTone, string[]>> = {
       '{a} e {b} dividiram o trabalho: uma na letra, outra na harmonia.',
     ],
   },
+  gravar: {
+    harmonia: [
+      '{a} e {b} gravaram juntas olhando uma para a outra. Dá para ouvir isso na faixa.',
+      'Na hora de gravar, {a} contou o tempo e {b} entrou exatamente onde devia. Sem precisar falar nada.',
+    ],
+    atrito: [
+      '{a} pediu para regravar a parte de {b} “só mais uma vez”. Foi a sétima.',
+      '{a} e {b} discordaram sobre a mixagem e passaram o resto da sessão sem se olhar.',
+    ],
+    faisca: [
+      '{a} e {b} transformaram a gravação numa disputa de quem errava menos. Ninguém errou.',
+    ],
+    neutro: [
+      '{a} e {b} gravaram suas partes com profissionalismo. Café, tomada, café, tomada.',
+    ],
+  },
   descansar: {
     harmonia: [
       '{a} e {b} saíram para comer pastel e ficaram conversando até a feira fechar.',

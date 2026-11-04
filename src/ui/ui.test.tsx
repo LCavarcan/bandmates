@@ -2,23 +2,28 @@
 import { renderToString } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { MEMBER_ORDER } from '../data/members';
-import { advanceWeek, createNewGame, setActivity } from '../engine';
+import { createNewGame, startSong } from '../engine';
+import { playCampaign } from '../engine/bot';
 import type { GameState, WeekReport } from '../engine/types';
 import { MemberCard } from './components/MemberCard';
 import { SeasonEnd, TitleScreen } from './components/Screens';
-import { PlanPanel, RelationsPanel, SongsPanel } from './components/SidePanel';
+import { ComposeModal } from './components/ComposeModal';
+import { PlanPanel } from './components/PlanPanel';
+import { RelationsPanel } from './components/RelationsPanel';
+import { SongsPanel } from './components/SongsPanel';
 import { TopBar } from './components/TopBar';
-import { WeekReportModal } from './components/WeekReportModal';
+import { EntriesModal, WeekReportModal } from './components/WeekReportModal';
 import { StudioBackdrop } from './art/StudioBackdrop';
 
 const noop = () => {};
 
 function playWeeks(n: number): { state: GameState; report: WeekReport } {
-  let s = createNewGame(99);
-  s = setActivity(setActivity(s, 'bia', 'compor'), 'julia', 'divulgar');
-  let report!: WeekReport;
-  for (let i = 0; i < n; i++) ({ state: s, report } = advanceWeek(s));
-  return { state: s, report };
+  const { state, reports } = playCampaign(
+    createNewGame(99),
+    { concept: { genre: 'punk', theme: 'liberdade', direction: 'emocional', leader: 'bia' } },
+    n,
+  );
+  return { state, report: reports[reports.length - 1] };
 }
 
 describe('interface', () => {
@@ -29,7 +34,7 @@ describe('interface', () => {
   });
 
   it('renderiza o estúdio depois de algumas semanas', () => {
-    const { state, report } = playWeeks(4);
+    const { state, report } = playWeeks(6);
     const html = renderToString(
       <>
         <TopBar state={state} onMenu={noop} />
@@ -38,7 +43,7 @@ describe('interface', () => {
           <MemberCard key={id} member={state.members[id]} activity={state.plan[id]} disabled={false} onChoose={noop} />
         ))}
         <PlanPanel state={state} onAdvance={noop} />
-        <SongsPanel state={state} />
+        <SongsPanel state={state} onNewSong={noop} onToggleRelease={noop} />
         <RelationsPanel state={state} />
         <WeekReportModal report={report} onClose={noop} />
       </>,
@@ -47,6 +52,21 @@ describe('interface', () => {
     expect(html).toContain('Semana');
     expect(state.songs.length).toBeGreaterThan(0);
     expect(html).toContain(state.songs[0].title);
+  });
+
+  it('renderiza o modal de composição e as reações', () => {
+    const s = createNewGame(5);
+    expect(renderToString(<ComposeModal state={s} onConfirm={noop} onCancel={noop} />)).toContain('Direção artística');
+    const { entries } = startSong(s, { title: 'X', genre: 'pop', theme: 'amor', direction: 'comercial', leader: 'nina' });
+    expect(entries.length).toBeGreaterThan(0);
+    const html = renderToString(<EntriesModal eyebrow="Nova música" title="X" entries={entries} buttonLabel="ok" onClose={noop} />);
+    expect(html).toContain('Lia');
+  });
+
+  it('mostra músicas em todos os estados ao longo da campanha', () => {
+    const { state } = playWeeks(12);
+    const html = renderToString(<SongsPanel state={state} onNewSong={noop} onToggleRelease={noop} />);
+    expect(html).toContain('Lançada');
   });
 
   it('renderiza o fim da temporada', () => {

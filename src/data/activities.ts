@@ -10,7 +10,7 @@ export interface ActivityDef {
   cost: number;
 }
 
-export const ACTIVITY_ORDER: ActivityId[] = ['ensaiar', 'compor', 'descansar', 'divulgar', 'bico'];
+export const ACTIVITY_ORDER: ActivityId[] = ['ensaiar', 'compor', 'gravar', 'descansar', 'divulgar', 'bico'];
 
 export const ACTIVITIES: Record<ActivityId, ActivityDef> = {
   ensaiar: {
@@ -18,7 +18,7 @@ export const ACTIVITIES: Record<ActivityId, ActivityDef> = {
     name: 'Ensaiar',
     icon: '🥁',
     short: 'Técnica e ritmo',
-    description: 'Melhora técnica e ritmo e lapida a música mais recente. Rende mais em grupo. Cansa.',
+    description: 'Melhora técnica e ritmo e lapida a próxima música a ser gravada. Rende mais em grupo. Cansa.',
     cost: 0,
   },
   compor: {
@@ -26,8 +26,16 @@ export const ACTIVITIES: Record<ActivityId, ActivityDef> = {
     name: 'Compor',
     icon: '✍️',
     short: 'Avança a música',
-    description: 'Avança a música em andamento. Composição e criatividade pesam; parcerias podem render — ou brigar.',
+    description: 'Avança a música em andamento. Rende mais com a líder presente; parcerias podem render — ou brigar.',
     cost: 0,
+  },
+  gravar: {
+    id: 'gravar',
+    name: 'Gravar',
+    icon: '🎙️',
+    short: 'Grava a faixa (R$ 50)',
+    description: 'Grava a próxima música composta. Técnica, ritmo e lapidação definem o resultado. Com a banda inteira, soa melhor.',
+    cost: 50,
   },
   descansar: {
     id: 'descansar',
@@ -42,7 +50,7 @@ export const ACTIVITIES: Record<ActivityId, ActivityDef> = {
     name: 'Divulgar',
     icon: '📣',
     short: 'Ganha fãs (R$ 40)',
-    description: 'Cartazes, redes sociais e conversa de bar. Ganha fãs; rende mais com músicas prontas e presença de palco.',
+    description: 'Cartazes, redes sociais e conversa de bar. Ganha fãs; rende mais com músicas lançadas e amplia um lançamento da mesma semana.',
     cost: 40,
   },
   bico: {
@@ -63,6 +71,8 @@ export const ECONOMY = {
   weeklyRent: 120,
   bicoBase: 110,
   bicoVariance: 30,
+  /** Streaming: decaimento semanal da renda de uma música lançada. */
+  streamDecay: 0.85,
 };
 
 /**
@@ -78,6 +88,10 @@ export const FLAVOR: Record<MemberId, Record<ActivityId, string[]>> = {
     compor: [
       'Júlia jurou que a música precisava de um refrão “que dê pra cantar no ônibus”. Escreveu quatro.',
       'Júlia passou a tarde cantarolando melodias no gravador. Metade era ótima; a outra metade era de outra pessoa.',
+    ],
+    gravar: [
+      'Júlia gravou a voz principal em duas tomadas e passou o resto do dia pedindo para ouvir “só mais uma vez”.',
+      'Júlia insistiu em gravar a voz de pé, de salto, “para sentir o palco”. Funcionou.',
     ],
     descansar: [
       'Júlia “descansou” num show de outra banda. Voltou com três contatos e uma inveja produtiva.',
@@ -101,6 +115,10 @@ export const FLAVOR: Record<MemberId, Record<ActivityId, string[]>> = {
       'Lia escreveu uma estrofe às três da manhã, apagou, e reescreveu de memória ao acordar.',
       'Lia encheu duas páginas do caderno. Quando perguntaram sobre o que era, disse “sobre nada”.',
     ],
+    gravar: [
+      'Lia gravou a guitarra com as luzes apagadas. Saiu na primeira tomada — e ela quis regravar mesmo assim.',
+      'Lia passou horas escolhendo o timbre certo. O resultado soa exatamente como a letra.',
+    ],
     descansar: [
       'Lia passou o dia num sebo. Voltou com um livro de poemas e o celular desligado.',
       'Lia dormiu mais do que acharia razoável admitir. Acordou mais leve.',
@@ -123,6 +141,10 @@ export const FLAVOR: Record<MemberId, Record<ActivityId, string[]>> = {
       'Bia batucou na mesa até sair uma ideia. A ideia era boa. Ela não lembra mais qual era.',
       'Bia propôs mudar a música inteira para 7/8. Ninguém deixou, mas uma parte da ideia ficou.',
     ],
+    gravar: [
+      'Bia gravou a bateria de primeira, rindo, e depois pediu para gravar “uma versão maluca” só por diversão.',
+      'Bia quebrou uma baqueta no meio da tomada e não parou de tocar. Ficou na versão final.',
+    ],
     descansar: [
       'Bia foi para a praia sem avisar ninguém. Mandou foto do pôr do sol no grupo da banda.',
       'Bia passou o domingo jogando videogame e cozinhando. Voltou recarregada e cheia de histórias.',
@@ -144,6 +166,10 @@ export const FLAVOR: Record<MemberId, Record<ActivityId, string[]>> = {
     compor: [
       'Nina organizou a estrutura da música num quadro branco: introdução, verso, ponte. Funcionou.',
       'Nina sugeriu uma linha de baixo que mudou o clima da música inteira. Fingiu que não era nada.',
+    ],
+    gravar: [
+      'Nina gravou o baixo com o metrônomo no ouvido e zero erros. Depois ouviu tudo de novo procurando um.',
+      'Nina anotou as configurações de cada microfone “para a próxima vez”. Já existe uma próxima vez no caderno dela.',
     ],
     descansar: [
       'Nina tirou o dia de folga. Passou a tarde revisando partituras “só para relaxar”.',

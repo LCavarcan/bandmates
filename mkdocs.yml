@@ -1,0 +1,85 @@
+site_name: Bandmates
+site_description: Documentação de design e desenvolvimento do Bandmates
+docs_dir: docs
+site_dir: site
+# Sem site_url: o site gerado funciona aberto direto do disco.
+use_directory_urls: false
+
+theme:
+  name: material
+  language: pt-BR
+  # Fontes do sistema: nenhuma requisição ao Google Fonts, funciona offline.
+  font: false
+  icon:
+    logo: material/music-note
+  palette:
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Modo claro
+    - scheme: default
+      primary: deep purple
+      accent: deep orange
+      toggle:
+        icon: material/weather-night
+        name: Modo escuro
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - search.highlight
+    - content.code.copy
+    - toc.follow
+
+extra_css:
+  - assets/extra.css
+
+plugins:
+  - search:
+      lang: pt
+  # Funciona aberto direto do disco (file://), sem servidor.
+  - offline
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  # Sem Mermaid: o tema o carregaria de um CDN externo.
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+
+nav:
+  - Início: index.md
+  - Como executar: executar.md
+  - Design:
+      - Visão e pilares: design/visao.md
+      - Personagens: design/personagens.md
+  - Mecânicas:
+      - Semana e atividades: mecanicas/semana.md
+      - Ciclo musical: mecanicas/musica.md
+      - Relações: mecanicas/relacoes.md
+      - Economia: mecanicas/economia.md
+  - Desenvolvimento:
+      - Arquitetura: dev/arquitetura.md
+      - Testes: dev/testes.md
+      - Saves e migrações: dev/saves.md
+      - Documentação: dev/documentacao.md
+  - Projeto:
+      - Roadmap: projeto/roadmap.md
+      - Decisões: projeto/decisoes.md
+      - Changelog: projeto/changelog.md
+
+extra:
+  # Cópia local do shim que o plugin "offline" buscaria em unpkg.com
+  # (iframe-worker 1.0.4, MIT, ver assets/vendor/iframe-worker-LICENSE.txt).
+  polyfills:
+    - assets/vendor/iframe-worker-shim.js

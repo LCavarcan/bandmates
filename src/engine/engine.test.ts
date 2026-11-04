@@ -11,12 +11,16 @@ import {
   saveGame,
   serialize,
   setActivity,
+  startSong,
   type ActivityId,
   type GameState,
   type KeyValueStore,
 } from './index';
 
 const SEED = 12345;
+
+const withSong = (s: GameState) =>
+  startSong(s, { title: 'Teste', genre: 'indie', theme: 'cidade', direction: 'emocional', leader: 'lia' }).state;
 
 function planAll(s: GameState, act: ActivityId): GameState {
   return MEMBER_ORDER.reduce((acc, id) => setActivity(acc, id, act), s);
@@ -36,6 +40,11 @@ describe('estado inicial', () => {
     const s2 = setActivity(s, 'julia', 'descansar');
     expect(s.plan.julia).toBe('ensaiar');
     expect(s2.plan.julia).toBe('descansar');
+  });
+
+  it('o plano inicial é válido (ninguém compõe sem música definida)', () => {
+    const s = createNewGame(SEED);
+    expect(() => advanceWeek(s)).not.toThrow();
   });
 });
 
@@ -103,7 +112,7 @@ describe('atividades', () => {
   });
 
   it('compor acumula progresso e eventualmente conclui uma música', () => {
-    let s = planAll(createNewGame(SEED), 'descansar');
+    let s = withSong(planAll(createNewGame(SEED), 'descansar'));
     s = setActivity(s, 'lia', 'compor');
     const first = advanceWeek(s).state;
     expect(first.draft).not.toBeNull();
@@ -118,7 +127,7 @@ describe('atividades', () => {
   });
 
   it('compor em dupla termina mais rápido que sozinha', () => {
-    const base = planAll(createNewGame(SEED), 'descansar');
+    const base = withSong(planAll(createNewGame(SEED), 'descansar'));
     const solo = advanceWeek(setActivity(base, 'lia', 'compor')).state.draft!.progress;
     const duo = advanceWeek(setActivity(setActivity(base, 'lia', 'compor'), 'nina', 'compor')).state.draft!.progress;
     expect(duo).toBeGreaterThan(solo);
@@ -166,7 +175,7 @@ describe('relações', () => {
   });
 
   it('quem não divide atividade não muda a relação', () => {
-    let s = createNewGame(SEED);
+    let s = withSong(createNewGame(SEED));
     s = setActivity(setActivity(setActivity(setActivity(s, 'julia', 'ensaiar'), 'lia', 'compor'), 'bia', 'descansar'), 'nina', 'bico');
     const { state } = advanceWeek(s);
     expect(state.relations).toEqual(s.relations);

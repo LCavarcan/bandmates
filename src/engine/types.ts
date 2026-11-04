@@ -17,7 +17,28 @@ export type TraitKey =
 
 export type EmotionKey = 'motivacao' | 'estresse' | 'confianca';
 
-export type ActivityId = 'ensaiar' | 'compor' | 'descansar' | 'divulgar' | 'bico';
+export type ActivityId = 'ensaiar' | 'compor' | 'gravar' | 'descansar' | 'divulgar' | 'bico';
+
+export type GenreId = 'indie' | 'pop' | 'alternativo' | 'punk';
+export type ThemeId =
+  | 'amor'
+  | 'cidade'
+  | 'amizade'
+  | 'liberdade'
+  | 'saudade'
+  | 'ambicao'
+  | 'recomeco'
+  | 'rebeldia';
+export type DirectionId = 'comercial' | 'experimental' | 'emocional';
+
+/** Escolhas feitas ao iniciar uma música. */
+export interface SongConcept {
+  title: string;
+  genre: GenreId;
+  theme: ThemeId;
+  direction: DirectionId;
+  leader: MemberId;
+}
 
 /** Dimensões de uma relação entre duas integrantes (escala -100..100). */
 export interface Relation {
@@ -36,7 +57,7 @@ export interface MemberState {
 }
 
 /** Música em composição. Acumula contribuições até completar 100% de progresso. */
-export interface SongDraft {
+export interface SongDraft extends SongConcept {
   progress: number;
   /** Somatórios ponderados pelo progresso de cada contribuição. */
   qualityWeighted: number;
@@ -45,15 +66,46 @@ export interface SongDraft {
   weekStarted: number;
 }
 
-export interface Song {
+export type SongStatus = 'composta' | 'gravada' | 'lancada';
+
+export interface RecordingProgress {
+  progress: number;
+  performanceWeighted: number;
+  players: MemberId[];
+}
+
+export type Reception = 'aclamada' | 'hit' | 'boa' | 'morna';
+
+export interface ReleaseResult {
+  week: number;
+  fans: number;
+  reputation: number;
+  reception: Reception;
+  /** Total ganho com streaming desde o lançamento. */
+  earnings: number;
+  /** Fãs ganhos com streaming desde o lançamento (além do lançamento). */
+  streamFans: number;
+}
+
+export interface Song extends SongConcept {
   id: string;
-  title: string;
-  quality: number;
-  originality: number;
-  /** Lapidação obtida em ensaios (0..100). */
-  polish: number;
   writers: MemberId[];
   weekCreated: number;
+  status: SongStatus;
+  /** Atributos de composição (0..100). */
+  quality: number;
+  originality: number;
+  commercial: number;
+  cohesion: number;
+  identity: number;
+  /** Lapidação obtida em ensaios (0..100). */
+  polish: number;
+  recording: RecordingProgress | null;
+  /** Qualidade da gravação (0..100), definida ao terminar de gravar. */
+  recordingQuality: number | null;
+  /** Nota final da faixa gravada (0..100). */
+  score: number | null;
+  release: ReleaseResult | null;
 }
 
 export interface Delta {
@@ -95,6 +147,8 @@ export interface GameState {
   draft: SongDraft | null;
   songs: Song[];
   plan: Plan;
+  /** Música gravada marcada para lançamento no fim desta semana. */
+  pendingRelease: string | null;
   /** Semente do gerador pseudoaleatório: torna a simulação reproduzível. */
   seed: number;
   history: WeekReport[];

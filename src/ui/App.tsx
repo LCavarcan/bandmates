@@ -1,13 +1,27 @@
 import { useCallback, useEffect, useState } from 'react';
 import { MEMBER_ORDER } from '../data/members';
-import { advanceWeek, createNewGame, deleteSave, loadGame, saveGame, setActivity } from '../engine';
-import type { ActivityId, GameState, MemberId, WeekReport } from '../engine/types';
+import {
+  advanceWeek,
+  bandIdentity,
+  createNewGame,
+  deleteSave,
+  loadGame,
+  recordingTarget,
+  saveGame,
+  setActivity,
+  setRelease,
+  startSong,
+} from '../engine';
+import type { ActivityId, GameState, LogEntry, MemberId, SongConcept, WeekReport } from '../engine/types';
 import { StudioBackdrop } from './art/StudioBackdrop';
+import { ComposeModal } from './components/ComposeModal';
 import { MemberCard } from './components/MemberCard';
+import { PlanPanel } from './components/PlanPanel';
+import { RelationsPanel } from './components/RelationsPanel';
 import { SeasonEnd, TitleScreen } from './components/Screens';
-import { PlanPanel, RelationsPanel, SongsPanel } from './components/SidePanel';
+import { SongsPanel } from './components/SongsPanel';
 import { TopBar } from './components/TopBar';
-import { WeekReportModal } from './components/WeekReportModal';
+import { EntriesModal, WeekReportModal } from './components/WeekReportModal';
 
 // localStorage pode estar indisponível (modo privado, etc.). O jogo continua, só não salva.
 const store = (() => {
@@ -20,10 +34,16 @@ const store = (() => {
   }
 })();
 
+type Overlay =
+  | { kind: 'report'; report: WeekReport }
+  | { kind: 'compose' }
+  | { kind: 'reactions'; title: string; entries: LogEntry[] }
+  | null;
+
 export function App() {
   const [game, setGame] = useState<GameState | null>(null);
   const [saved, setSaved] = useState<GameState | null>(() => (store ? loadGame(store) : null));
-  const [report, setReport] = useState<WeekReport | null>(null);
+  const [overlay, setOverlay] = useState<Overlay>(null);
 
   // Salvamento automático a cada mudança de estado.
   useEffect(() => {
@@ -35,7 +55,7 @@ export function App() {
 
   const startNew = () => {
     if (store) deleteSave(store);
-    setReport(null);
+    setOverlay(null);
     setGame(createNewGame());
   };
 
@@ -45,14 +65,26 @@ export function App() {
     if (!game) return;
     const r = advanceWeek(game);
     setGame(r.state);
-    setReport(r.report);
+    setOverlay({ kind: 'report', report: r.report });
   };
 
-  const closeReport = useCallback(() => setReport(null), []);
+  const confirmSong = (c: SongConcept) => {
+    if (!game) return;
+    const r = startSong(game, c);
+    setGame(r.state);
+    setOverlay({ kind: 'reactions', title: `“${r.state.draft?.title ?? c.title}”`, entries: r.entries });
+  };
+
+  const closeOverlay = useCallback(() => setOverlay(null), []);
 
   if (!game) {
     return <TitleScreen saved={saved} onContinue={() => saved && setGame(saved)} onNew={startNew} />;
   }
+
+  const unavailable: Partial<Record<ActivityId, string>> = {};
+  if (!game.draft) unavailable.compor = 'Defina uma nova música no painel “Músicas” para poder compor.';
+  if (!recordingTarget(game)) unavailable.gravar = 'Não há música composta esperando gravação.';
+  const identity = bandIdentity(game);
 
   return (
     <div className="app">
@@ -62,7 +94,7 @@ export function App() {
           <div className="scene">
             <StudioBackdrop week={game.week} />
             <div className="scene__caption">
-              <p className="eyebrow">Estúdio Porão 27</p>
+              <p className="eyebrow">Estúdio Porão 27 · {identity.label}</p>
               <h1>{game.finished ? 'Temporada encerrada' : `Semana ${game.week} — o que a banda vai fazer?`}</h1>
             </div>
           </div>
@@ -75,7 +107,8 @@ export function App() {
                   key={id}
                   member={game.members[id]}
                   activity={game.plan[id]}
-                  disabled={game.finished}
+                  disabled={false}
+                  unavailable={unavailable}
                   onChoose={(a) => choose(id, a)}
                 />
               ))}
@@ -84,11 +117,26 @@ export function App() {
         </div>
         <aside className="studio__side">
           {!game.finished && <PlanPanel state={game} onAdvance={advance} />}
-          <SongsPanel state={game} />
+          <SongsPanel
+            state={game}
+            onNewSong={() => setOverlay({ kind: 'compose' })}
+            onToggleRelease={(id) => setGame((g) => (g ? setRelease(g, id) : g))}
+          />
           <RelationsPanel state={game} />
         </aside>
       </main>
-      {report && <WeekReportModal report={report} onClose={closeReport} />}
+      {overlay?.kind === 'report' && <WeekReportModal report={overlay.report} onClose={closeOverlay} />}
+      {overlay?.kind === 'compose' && <ComposeModal state={game} onConfirm={confirmSong} onCancel={closeOverlay} />}
+      {overlay?.kind === 'reactions' && (
+        <EntriesModal
+          eyebrow="Nova música"
+          title={overlay.title}
+          entries={overlay.entries}
+          sectionTitles={{ member: 'Reações da banda' }}
+          buttonLabel="Mãos à obra"
+          onClose={closeOverlay}
+        />
+      )}
     </div>
   );
 }

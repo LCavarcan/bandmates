@@ -1,0 +1,32 @@
+# Saves e migrações
+
+Código: `src/engine/save.ts`.
+
+## Formato
+
+O save fica em `localStorage`, na chave `bandmates.save`:
+
+```json
+{
+  "version": 2,
+  "savedAt": "2026-11-04T12:00:00.000Z",
+  "state": { "...": "GameState completo" }
+}
+```
+
+O jogo salva automaticamente a cada mudança de estado. O armazenamento é acessado pela interface mínima `KeyValueStore`; nos testes, ela é substituída por um mapa em memória.
+
+## Versões
+
+| Versão | Mudança |
+|---|---|
+| 1 | Fase 1: músicas com qualidade, originalidade e lapidação |
+| 2 | Fase 2: conceito (gênero, tema, direção, líder), apelo, coesão, identidade, gravação, lançamento, `pendingRelease` |
+
+## Como adicionar uma migração
+
+1. Aumente `SAVE_VERSION` em `src/engine/state.ts`.
+2. Em `MIGRATIONS`, em `save.ts`, adicione a entrada `[versão antiga]: (st) => { ...; st.version = nova; return st; }`.
+3. Escreva um teste que carregue um save da versão antiga (veja "converte um save v1 para v2" em `music.test.ts`).
+
+As migrações são aplicadas em cadeia (v1 → v2 → v3…). Um save de versão desconhecida é rejeitado, e a tela de título oferece uma nova campanha.

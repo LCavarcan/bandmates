@@ -1,25 +1,25 @@
-// Resolução de uma semana. Todas as fórmulas estão documentadas em docs/FORMULAS.md.
-import { ACTIVITIES, ECONOMY, FLAVOR, SONG_TITLES } from '../data/activities';
-import { EMOTION_LABELS, RELATION_LABELS, SKILL_LABELS } from '../data/labels';
+// Resolução de uma semana. Fórmulas documentadas em docs/mecanicas/.
+import { ACTIVITIES, ECONOMY, FLAVOR } from '../data/activities';
+import { RELATION_LABELS } from '../data/labels';
 import { MEMBER_ORDER, MEMBERS } from '../data/members';
 import { PAIR_LINES } from '../data/pairs';
-import { applyRelationDelta, getRelation, pairInteraction, synergy } from './relations';
+import { MemberChanges, trait } from './changes';
+import {
+  composeContribution,
+  finalizeRecording,
+  finalizeSong,
+  planIssues,
+  recordContribution,
+  recordingTarget,
+  rehearsalTarget,
+  releaseOutcome,
+  releaseText,
+  streamingFor,
+} from './music';
+import { applyRelationDelta, getRelation, pairInteraction } from './relations';
 import { createRng, type Rng } from './rng';
-import type {
-  ActivityId,
-  Delta,
-  EmotionKey,
-  GameState,
-  LogEntry,
-  MemberId,
-  MemberState,
-  RelationKey,
-  SkillKey,
-  WeekReport,
-} from './types';
+import type { ActivityId, Delta, GameState, LogEntry, MemberId, MemberState, RelationKey, WeekReport } from './types';
 import { clamp, gainScale } from './util';
-
-const trait = (id: MemberId, k: keyof (typeof MEMBERS)['julia']['traits']) => MEMBERS[id].traits[k] ?? 0;
 
 /**
  * Fator de disposição (0.36..1.0): motivação alta e estresse baixo rendem mais.
@@ -31,36 +31,11 @@ export function moodFactor(m: MemberState): number {
 
 export const BURNOUT_STRESS = 85;
 
-/** Registra mudanças de uma integrante para exibir no resumo. */
-class MemberChanges {
-  private deltas = new Map<string, Delta>();
-  constructor(private m: MemberState) {}
-
-  skill(k: SkillKey, v: number) {
-    const before = this.m.skills[k];
-    this.m.skills[k] = clamp(before + Math.round(v));
-    this.track(SKILL_LABELS[k], this.m.skills[k] - before);
-  }
-  emotion(k: EmotionKey, v: number) {
-    const before = this.m.emotions[k];
-    this.m.emotions[k] = clamp(before + Math.round(v));
-    this.track(EMOTION_LABELS[k], this.m.emotions[k] - before, k === 'estresse');
-  }
-  private track(label: string, v: number, inverse = false) {
-    if (v === 0) return;
-    const d = this.deltas.get(label);
-    if (d) d.value += v;
-    else this.deltas.set(label, { label, value: v, inverse });
-  }
-  list(): Delta[] {
-    return [...this.deltas.values()].filter((d) => d.value !== 0);
-  }
-}
-
 interface WeekContext {
   s: GameState;
   rng: Rng;
-  entries: LogEntry[];
+  /** Alertas extras gerados durante a resolução (ex.: atraso no trabalho). */
+  extra: LogEntry[];
   changes: Record<MemberId, MemberChanges>;
   /** Fator de disposição calculado no início da semana (antes das mudanças). */
   mf: Record<MemberId, number>;
@@ -75,16 +50,22 @@ export interface WeekResult {
   report: WeekReport;
 }
 
+export class InvalidPlanError extends Error {}
+
 export function advanceWeek(prev: GameState): WeekResult {
   if (prev.finished) {
     return { state: prev, report: { week: prev.week, entries: [], money: 0, fans: 0, reputation: 0 } };
   }
+  const issues = planIssues(prev);
+  if (issues.length) throw new InvalidPlanError(issues.join(' '));
+
   const s: GameState = structuredClone(prev);
   const rng = createRng(s.seed);
 
   const byActivity: Record<ActivityId, MemberId[]> = {
     ensaiar: [],
     compor: [],
+    gravar: [],
     descansar: [],
     divulgar: [],
     bico: [],
@@ -94,7 +75,7 @@ export function advanceWeek(prev: GameState): WeekResult {
   const ctx: WeekContext = {
     s,
     rng,
-    entries: [],
+    extra: [],
     changes: {} as Record<MemberId, MemberChanges>,
     mf: {} as Record<MemberId, number>,
     byActivity,
@@ -115,9 +96,25 @@ export function advanceWeek(prev: GameState): WeekResult {
     memberText[id] = rng.pick(FLAVOR[id][act]);
     RESOLVERS[act](ctx, id);
   }
+  if (byActivity.compor.length && s.draft && !byActivity.compor.includes(s.draft.leader)) {
+    ctx.extra.push({
+      kind: 'warning',
+      members: [s.draft.leader],
+      text: `Sem ${MEMBERS[s.draft.leader].name}, que lidera “${s.draft.title}”, a composição andou devagar.`,
+      deltas: [],
+    });
+  }
 
-  // 2. Música em composição pode ter sido concluída
-  const songEntry = finishSongIfReady(ctx);
+  // 2. Música: composição concluída, gravação concluída, lançamento, streaming
+  const musicEntries: LogEntry[] = [];
+  const composed = finishSongIfReady(ctx);
+  if (composed) musicEntries.push(composed);
+  const recorded = finishRecordingIfReady(ctx);
+  if (recorded) musicEntries.push(recorded);
+  const streaming = collectStreaming(ctx);
+  if (streaming) musicEntries.push(streaming);
+  const released = releaseIfPending(ctx);
+  if (released) musicEntries.push(released);
 
   // 3. Interações em dupla (mesma atividade)
   const pairEntries: LogEntry[] = [];
@@ -161,16 +158,14 @@ export function advanceWeek(prev: GameState): WeekResult {
     });
   }
 
-  // Monta o relatório: integrantes → música → duplas → banda → alertas
-  // (list() é lido aqui, então já inclui o efeito do caixa no vermelho.)
+  // Monta o relatório. list() é lido aqui, então já inclui o efeito do caixa no vermelho.
   const entries: LogEntry[] = MEMBER_ORDER.map((id) => ({
     kind: 'member' as const,
     members: [id],
     text: memberText[id]!,
     deltas: ctx.changes[id].list(),
   }));
-  if (songEntry) entries.push(songEntry);
-  entries.push(...pairEntries, ...bandEntries, ...ctx.entries, ...wellbeingWarnings(s));
+  entries.push(...musicEntries, ...pairEntries, ...bandEntries, ...ctx.extra, ...wellbeingWarnings(s));
 
   const report: WeekReport = {
     week: s.week,
@@ -208,51 +203,50 @@ const RESOLVERS: Record<ActivityId, Resolver> = {
     c.emotion('confianca', 2);
     if (trait(id, 'impulsividade') >= 60) c.emotion('motivacao', groupSize >= 2 ? 3 : -4);
 
-    // Lapida a música mais recente que ainda não está perfeita.
-    const song = [...ctx.s.songs].reverse().find((x) => x.polish < 100);
+    const song = rehearsalTarget(ctx.s);
     if (song) song.polish = clamp(song.polish + (4 + m.skills.tecnica * 0.08) * mf);
   },
 
   compor(ctx, id) {
     const s = ctx.s;
+    const draft = s.draft!; // garantido por planIssues
     const m = s.members[id];
     const c = ctx.changes[id];
     const mf = ctx.mf[id];
-    if (!s.draft) {
-      s.draft = { progress: 0, qualityWeighted: 0, originalityWeighted: 0, writers: [], weekStarted: s.week };
-    }
-    const draft = s.draft;
 
-    // Parceria: química média com as outras compositoras da semana.
-    const partners = ctx.byActivity.compor.filter((o) => o !== id);
-    let collab = 1;
-    let tensionBonus = 0;
-    if (partners.length) {
-      const rels = partners.map((o) => getRelation(s.relations, id, o));
-      const avgSyn = rels.reduce((a, r) => a + synergy(r), 0) / rels.length;
-      collab = 1 + clamp(avgSyn, -30, 30) / 100;
-      // Discordância com respeito gera originalidade.
-      tensionBonus = rels.reduce((a, r) => a + (r.respeito >= 20 ? Math.max(0, r.rivalidade) * 0.15 : 0), 0) / rels.length;
-    }
-
-    const contribution = (8 + m.skills.composicao * 0.25 + trait(id, 'criatividade') * 0.08) * mf * collab;
-    const quality = m.skills.composicao * 0.7 + m.skills.tecnica * 0.15 + mf * 15;
-    const originality = trait(id, 'criatividade') * 0.55 + m.skills.composicao * 0.3 + ctx.rng.int(0, 10) + tensionBonus;
-
-    draft.progress += contribution;
-    draft.qualityWeighted += quality * contribution;
-    draft.originalityWeighted += originality * contribution;
+    const contrib = composeContribution(s, draft, id, mf, ctx.byActivity.compor, ctx.rng);
+    draft.progress += contrib.progress;
+    draft.qualityWeighted += contrib.quality * contrib.progress;
+    draft.originalityWeighted += contrib.originality * contrib.progress;
     if (!draft.writers.includes(id)) draft.writers.push(id);
 
     c.skill('composicao', (3 + trait(id, 'criatividade') / 50) * mf * gainScale(m.skills.composicao) + ctx.rng.next());
     c.emotion('estresse', 4);
     if (trait(id, 'sensibilidade') >= 70) {
       // Sensíveis oscilam: semana produtiva dá confiança, semana travada machuca.
-      c.emotion('confianca', contribution >= 20 ? 4 : -3);
+      c.emotion('confianca', contrib.progress >= 20 ? 4 : -3);
     } else {
       c.emotion('confianca', 2);
     }
     if (trait(id, 'ambicao') >= 70) c.emotion('motivacao', 2);
+  },
+
+  gravar(ctx, id) {
+    const s = ctx.s;
+    const song = recordingTarget(s)!; // garantido por planIssues
+    const m = s.members[id];
+    const c = ctx.changes[id];
+    ctx.money -= ACTIVITIES.gravar.cost;
+
+    song.recording ??= { progress: 0, performanceWeighted: 0, players: [] };
+    const r = recordContribution(m, ctx.mf[id]);
+    song.recording.progress += r.progress;
+    song.recording.performanceWeighted += r.performance * r.progress;
+    if (!song.recording.players.includes(id)) song.recording.players.push(id);
+
+    c.skill('tecnica', 1.5 * gainScale(m.skills.tecnica) + ctx.rng.next());
+    c.emotion('estresse', 7 + trait(id, 'perfeccionismo') / 20);
+    c.emotion('confianca', 2);
   },
 
   descansar(ctx, id) {
@@ -277,7 +271,8 @@ const RESOLVERS: Record<ActivityId, Resolver> = {
     const mf = ctx.mf[id];
     ctx.money -= ACTIVITIES.divulgar.cost;
 
-    const songBoost = 1 + Math.min(ctx.s.songs.length, 4) * 0.25;
+    const released = ctx.s.songs.filter((x) => x.status === 'lancada').length;
+    const songBoost = 1 + Math.min(released, 4) * 0.25;
     const fans = Math.round(
       (6 + m.skills.presenca * 0.15 + trait(id, 'sociabilidade') * 0.08) * mf * songBoost + ctx.rng.int(0, 3),
     );
@@ -300,7 +295,7 @@ const RESOLVERS: Record<ActivityId, Resolver> = {
     let pay = ECONOMY.bicoBase + ctx.rng.int(0, ECONOMY.bicoVariance);
     if (trait(id, 'impulsividade') >= 60 && ctx.rng.chance(0.2)) {
       pay -= 40;
-      ctx.entries.push({
+      ctx.extra.push({
         kind: 'warning',
         members: [id],
         text: `${MEMBERS[id].name} chegou atrasada no trabalho extra e descontaram do pagamento.`,
@@ -312,6 +307,105 @@ const RESOLVERS: Record<ActivityId, Resolver> = {
     c.emotion('motivacao', trait(id, 'ambicao') >= 70 ? -9 : -5);
   },
 };
+
+// ---------------------------------------------------------------------------
+// Música
+
+function finishSongIfReady(ctx: WeekContext): LogEntry | null {
+  const s = ctx.s;
+  const d = s.draft;
+  if (!d || d.progress < 100) return null;
+  const song = finalizeSong(s, d);
+  s.songs.push(song);
+  s.draft = null;
+
+  for (const w of song.writers) ctx.changes[w].emotion('confianca', 5);
+  const names = song.writers.map((w) => MEMBERS[w].name).join(' e ');
+  return {
+    kind: 'song',
+    members: song.writers.slice(0, 2),
+    text: `Música composta: “${song.title}”, assinada por ${names}. Agora ela precisa ser gravada.`,
+    deltas: [
+      { label: 'Qualidade', value: song.quality },
+      { label: 'Originalidade', value: song.originality },
+      { label: 'Apelo', value: song.commercial },
+      { label: 'Coesão', value: song.cohesion },
+      { label: 'Identidade', value: song.identity },
+    ],
+  };
+}
+
+function finishRecordingIfReady(ctx: WeekContext): LogEntry | null {
+  const song = ctx.s.songs.find((x) => x.status === 'composta' && x.recording && x.recording.progress >= 100);
+  if (!song) return null;
+  const players = song.recording!.players;
+  finalizeRecording(song);
+  song.recording = null;
+  const full = players.length === MEMBER_ORDER.length;
+  return {
+    kind: 'song',
+    members: players.slice(0, 2),
+    text: `“${song.title}” está gravada${full ? ', com a banda inteira no estúdio' : ''}. Pronta para lançar.`,
+    deltas: [
+      { label: 'Gravação', value: song.recordingQuality! },
+      { label: 'Nota final', value: song.score! },
+    ],
+  };
+}
+
+function releaseIfPending(ctx: WeekContext): LogEntry | null {
+  const s = ctx.s;
+  const song = s.songs.find((x) => x.id === s.pendingRelease && x.status === 'gravada');
+  s.pendingRelease = null;
+  if (!song) return null;
+
+  const promoters = ctx.byActivity.divulgar.length;
+  const out = releaseOutcome(song, promoters, s.reputation);
+  ctx.fans += out.fans;
+  ctx.reputation += out.reputation;
+  song.status = 'lancada';
+  song.release = { week: s.week, fans: out.fans, reputation: out.reputation, reception: out.reception, earnings: 0, streamFans: 0 };
+
+  const good = out.reception !== 'morna';
+  for (const w of song.writers) ctx.changes[w].emotion('confianca', good ? 4 : -4);
+  for (const id of MEMBER_ORDER) ctx.changes[id].emotion('motivacao', good ? 3 : -2);
+
+  const extra = promoters ? ` A divulgação da semana ampliou o alcance (${promoters} divulgando).` : '';
+  return {
+    kind: 'song',
+    members: song.writers.slice(0, 2),
+    text: `Lançamento! ${releaseText(song, out.reception, ctx.rng)}${extra}`,
+    deltas: [
+      { label: 'Fãs', value: out.fans },
+      { label: 'Reputação', value: out.reputation },
+    ],
+  };
+}
+
+function collectStreaming(ctx: WeekContext): LogEntry | null {
+  let money = 0;
+  let fans = 0;
+  for (const song of ctx.s.songs) {
+    const st = streamingFor(song, ctx.s.week);
+    if (!st.money && !st.fans) continue;
+    song.release!.earnings += st.money;
+    song.release!.streamFans += st.fans;
+    money += st.money;
+    fans += st.fans;
+  }
+  if (!money && !fans) return null;
+  ctx.money += money;
+  ctx.fans += fans;
+  return {
+    kind: 'band',
+    members: [],
+    text: 'As músicas lançadas continuam tocando por aí.',
+    deltas: [
+      { label: 'Dinheiro', value: money },
+      { label: 'Fãs', value: fans },
+    ],
+  };
+}
 
 // ---------------------------------------------------------------------------
 
@@ -333,41 +427,6 @@ function resolvePair(ctx: WeekContext, a: MemberId, b: MemberId, act: ActivityId
   return { kind: 'pair', members: [a, b], text, deltas };
 }
 
-function finishSongIfReady(ctx: WeekContext): LogEntry | null {
-  const s = ctx.s;
-  const d = s.draft;
-  if (!d || d.progress < 100) return null;
-
-  const used = new Set(s.songs.map((x) => x.title));
-  const free = SONG_TITLES.filter((t) => !used.has(t));
-  const title = free.length ? ctx.rng.pick(free) : `Faixa ${s.songs.length + 1}`;
-
-  const quality = Math.round(clamp(d.qualityWeighted / d.progress));
-  const originality = Math.round(clamp(d.originalityWeighted / d.progress));
-  s.songs.push({
-    id: `song-${s.songs.length + 1}`,
-    title,
-    quality,
-    originality,
-    polish: 0,
-    writers: [...d.writers],
-    weekCreated: s.week,
-  });
-  s.draft = null;
-
-  for (const w of d.writers) ctx.changes[w].emotion('confianca', 5);
-  const names = d.writers.map((w) => MEMBERS[w].name).join(' e ');
-  return {
-    kind: 'song',
-    members: [...d.writers],
-    text: `Nova música pronta: “${title}”, assinada por ${names}.`,
-    deltas: [
-      { label: 'Qualidade', value: quality },
-      { label: 'Originalidade', value: originality },
-    ],
-  };
-}
-
 function wellbeingWarnings(s: GameState): LogEntry[] {
   const out: LogEntry[] = [];
   for (const id of MEMBER_ORDER) {
@@ -387,8 +446,10 @@ function wellbeingWarnings(s: GameState): LogEntry[] {
 
 /** Estimativa de dinheiro da semana planejada (para o painel de planejamento). */
 export function estimateMoney(s: GameState): { min: number; max: number } {
-  let min = -ECONOMY.weeklyRent;
-  let max = -ECONOMY.weeklyRent;
+  let base = -ECONOMY.weeklyRent;
+  for (const song of s.songs) base += streamingFor(song, s.week).money;
+  let min = base;
+  let max = base;
   for (const id of MEMBER_ORDER) {
     const act = s.plan[id];
     min -= ACTIVITIES[act].cost;

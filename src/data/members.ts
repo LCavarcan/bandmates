@@ -1,4 +1,4 @@
-import type { EmotionKey, MemberId, Relation, SkillKey, TraitKey } from '../engine/types';
+import type { EmotionKey, GenreId, MemberId, Relation, SkillKey, ThemeId, TraitKey } from '../engine/types';
 
 /** Configuração visual do retrato provisório (SVG). Trocar por arte definitiva não exige mudar a lógica. */
 export interface PortraitConfig {
@@ -24,6 +24,10 @@ export interface MemberProfile {
   fears: string;
   musicalTaste: string;
   traits: Partial<Record<TraitKey, number>>;
+  /** Afinidade com cada gênero (0..100): afeta qualidade, coesão e reação ao escolher o gênero. */
+  genres: Record<GenreId, number>;
+  /** Quanto cada tema ressoa com ela (0..100; ausente = 40). */
+  themes: Partial<Record<ThemeId, number>>;
   startSkills: Record<SkillKey, number>;
   startEmotions: Record<EmotionKey, number>;
   portrait: PortraitConfig;
@@ -43,6 +47,8 @@ export const MEMBERS: Record<MemberId, MemberProfile> = {
     fears: 'Trabalhar duro e continuar invisível.',
     musicalTaste: 'Pop com refrão grande, divas dos anos 2000, qualquer coisa que dê pra cantar de olhos fechados.',
     traits: { ambicao: 85, sociabilidade: 75, competitividade: 80, sensibilidade: 40 },
+    genres: { pop: 90, indie: 55, alternativo: 45, punk: 50 },
+    themes: { ambicao: 95, amor: 60, amizade: 60, liberdade: 50, rebeldia: 55 },
     startSkills: { composicao: 35, tecnica: 50, ritmo: 45, presenca: 76 },
     startEmotions: { motivacao: 75, estresse: 30, confianca: 66 },
     portrait: {
@@ -67,6 +73,8 @@ export const MEMBERS: Record<MemberId, MemberProfile> = {
     fears: 'Que rejeitem a música — e, com ela, a ela mesma.',
     musicalTaste: 'Indie melancólico, guitarras com reverb, letras que doem um pouquinho.',
     traits: { criatividade: 90, sensibilidade: 80, perfeccionismo: 50, sociabilidade: 30 },
+    genres: { indie: 92, alternativo: 80, pop: 35, punk: 45 },
+    themes: { amor: 90, saudade: 85, cidade: 70, recomeco: 55 },
     startSkills: { composicao: 72, tecnica: 55, ritmo: 44, presenca: 30 },
     startEmotions: { motivacao: 60, estresse: 38, confianca: 40 },
     portrait: {
@@ -91,6 +99,8 @@ export const MEMBERS: Record<MemberId, MemberProfile> = {
     fears: 'Decepcionar alguém que contava com ela.',
     musicalTaste: 'Punk, samba-rock, qualquer coisa com uma virada de bateria absurda.',
     traits: { impulsividade: 80, sociabilidade: 85, criatividade: 65, disciplina: 20 },
+    genres: { punk: 92, indie: 65, alternativo: 60, pop: 55 },
+    themes: { amizade: 90, liberdade: 85, rebeldia: 80, cidade: 55 },
     startSkills: { composicao: 40, tecnica: 45, ritmo: 72, presenca: 60 },
     startEmotions: { motivacao: 70, estresse: 20, confianca: 60 },
     portrait: {
@@ -115,6 +125,8 @@ export const MEMBERS: Record<MemberId, MemberProfile> = {
     fears: 'O imprevisível. Principalmente quando vem de pessoas.',
     musicalTaste: 'Jazz fusion, math rock, linhas de baixo que ninguém nota mas todo mundo sente.',
     traits: { disciplina: 90, perfeccionismo: 85, sensibilidade: 45, sociabilidade: 30, ambicao: 50 },
+    genres: { alternativo: 88, indie: 60, pop: 45, punk: 35 },
+    themes: { recomeco: 75, saudade: 60, cidade: 60, ambicao: 55, amor: 55 },
     startSkills: { composicao: 45, tecnica: 73, ritmo: 66, presenca: 30 },
     startEmotions: { motivacao: 65, estresse: 42, confianca: 50 },
     portrait: {

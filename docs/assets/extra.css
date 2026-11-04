@@ -1,0 +1,18 @@
+/* Paleta do Bandmates aplicada à documentação. */
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #1d1630;
+  --md-default-bg-color--light: #261d3f;
+  --md-code-bg-color: #261d3f;
+  --md-primary-fg-color: #2c2248;
+  --md-accent-fg-color: #ffb347;
+  --md-typeset-a-color: #ffb347;
+}
+:root {
+  --md-text-font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --md-code-font-family: "Cascadia Code", Consolas, monospace;
+}
+.md-typeset h1,
+.md-typeset h2,
+.md-header__title {
+  font-family: "Bahnschrift", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+}

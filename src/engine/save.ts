@@ -35,11 +35,43 @@ export function deserialize(raw: string): GameState | null {
   }
 }
 
-/** Ponto único para atualizar saves antigos quando o formato mudar. */
+/** Ponto único para atualizar saves antigos quando o formato mudar. Cada passo leva da versão N para N+1. */
+const MIGRATIONS: Record<number, (state: any) => any> = {
+  // v1 → v2: músicas ganharam gênero, tema, direção, líder, estado de gravação e lançamento.
+  1: (st) => {
+    const defaults = { genre: 'indie', theme: 'cidade', direction: 'emocional' };
+    st.songs = (st.songs ?? []).map((x: any) => ({
+      ...defaults,
+      leader: x.writers?.[0] ?? 'lia',
+      commercial: 40,
+      cohesion: 55,
+      identity: 50,
+      status: 'composta',
+      recording: null,
+      recordingQuality: null,
+      score: null,
+      release: null,
+      ...x,
+    }));
+    if (st.draft) st.draft = { ...defaults, title: 'Sem título', leader: st.draft.writers?.[0] ?? 'lia', ...st.draft };
+    // "compor" sem rascunho deixou de ser válido.
+    if (!st.draft) for (const k of Object.keys(st.plan ?? {})) if (st.plan[k] === 'compor') st.plan[k] = 'ensaiar';
+    st.pendingRelease = null;
+    st.version = 2;
+    return st;
+  },
+};
+
 function migrate(version: number, state: GameState): GameState | null {
-  if (version === SAVE_VERSION) return state;
-  // Versões futuras: adicionar passos de migração aqui (v1 → v2 → ...).
-  return null;
+  let st: any = state;
+  let v = version;
+  while (v < SAVE_VERSION) {
+    const step = MIGRATIONS[v];
+    if (!step) return null;
+    st = step(st);
+    v++;
+  }
+  return v === SAVE_VERSION ? (st as GameState) : null;
 }
 
 export function saveGame(store: KeyValueStore, state: GameState): void {

@@ -11,10 +11,12 @@ interface Props {
   member: MemberState;
   activity: ActivityId;
   disabled: boolean;
+  /** Atividades indisponíveis nesta semana, com o motivo. */
+  unavailable?: Partial<Record<ActivityId, string>>;
   onChoose: (a: ActivityId) => void;
 }
 
-export function MemberCard({ member, activity, disabled, onChoose }: Props) {
+export function MemberCard({ member, activity, disabled, unavailable = {}, onChoose }: Props) {
   const p = MEMBERS[member.id];
   const mood = moodOf(member);
   const [showProfile, setShowProfile] = useState(false);
@@ -74,15 +76,16 @@ export function MemberCard({ member, activity, disabled, onChoose }: Props) {
         {ACTIVITY_ORDER.map((id) => {
           const a = ACTIVITIES[id];
           const selected = id === activity;
+          const blocked = unavailable[id];
           return (
             <button
               key={id}
               role="radio"
               aria-checked={selected}
-              disabled={disabled}
-              className={`activity ${selected ? 'activity--on' : ''}`}
+              disabled={disabled || (!!blocked && !selected)}
+              className={`activity ${selected ? 'activity--on' : ''} ${blocked && selected ? 'activity--blocked' : ''}`}
               onClick={() => onChoose(id)}
-              title={a.description}
+              title={blocked ?? a.description}
             >
               <span className="activity__icon" aria-hidden="true">{a.icon}</span>
               <span className="activity__name">{a.name}</span>
@@ -90,7 +93,9 @@ export function MemberCard({ member, activity, disabled, onChoose }: Props) {
           );
         })}
       </div>
-      <p className="activity-hint">{ACTIVITIES[activity].description}</p>
+      <p className={`activity-hint ${unavailable[activity] ? 'activity-hint--warn' : ''}`}>
+        {unavailable[activity] ?? ACTIVITIES[activity].description}
+      </p>
     </article>
   );
 }
