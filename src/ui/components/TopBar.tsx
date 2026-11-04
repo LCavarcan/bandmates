@@ -26,7 +26,7 @@ export function TopBar({ state, onMenu }: { state: GameState; onMenu: () => void
               <li
                 key={w}
                 className={cls.join(' ')}
-                title={w === state.maxWeeks ? `Semana ${w}: fim da temporada` : `Semana ${w}`}
+                title={w === state.maxWeeks ? `Semana ${w}: seletiva do Festival Maré Alta` : `Semana ${w}`}
               />
             );
           })}

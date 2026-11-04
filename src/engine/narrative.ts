@@ -4,7 +4,7 @@ import { ACTIVITIES } from '../data/activities';
 import { RELATION_LABELS } from '../data/labels';
 import { MEMBER_ORDER, MEMBERS } from '../data/members';
 import { MemberChanges } from './changes';
-import { applyRelationDelta, getRelation, relationKey } from './relations';
+import { applyRelationDelta, getRelation, relationKey, synergy } from './relations';
 import type { Rng } from './rng';
 import type {
   ActivityId,
@@ -25,6 +25,12 @@ import { clamp } from './util';
 
 const inRange = (v: number, c: { min?: number; max?: number }) =>
   (c.min === undefined || v >= c.min) && (c.max === undefined || v <= c.max);
+
+/** Sinergia média entre todos os pares da banda. */
+export function bandUnity(s: GameState): number {
+  const rels = Object.values(s.relations);
+  return rels.reduce((acc, r) => acc + synergy(r), 0) / rels.length;
+}
 
 /** Música lançada na semana `week`, se houver. */
 export function releasedIn(s: GameState, week: number): Song | undefined {
@@ -73,7 +79,11 @@ export function evaluate(c: Condition, s: GameState, week: number, rng?: Rng): b
       return true;
     }
     case 'songs':
-      return s.songs.filter((x) => x.status === c.status).length >= c.min;
+      return s.songs.filter((x) => c.statuses.includes(x.status)).length >= c.min;
+    case 'shows':
+      return s.shows.filter((x) => x.venue !== 'festival' && x.score >= (c.minScore ?? 0)).length >= c.min;
+    case 'unity':
+      return bandUnity(s) >= c.min;
     case 'chance':
       return rng ? rng.chance(c.p) : true;
     case 'all':

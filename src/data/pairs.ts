@@ -86,6 +86,22 @@ export const PAIR_LINES: Record<ActivityId, Record<PairTone, string[]>> = {
       '{a} e {b} dividiram os bairros e cada uma cuidou do seu.',
     ],
   },
+  show: {
+    harmonia: [
+      'No meio do show, {a} e {b} se olharam e sorriram ao mesmo tempo. A plateia percebeu.',
+      '{a} errou uma entrada; {b} cobriu tão rápido que parecia ensaiado.',
+    ],
+    atrito: [
+      '{a} acelerou o tempo no palco. {b} não perdoou — nem no palco, nem no camarim.',
+      'Entre uma música e outra, {a} e {b} trocaram uma frase seca que o microfone quase pegou.',
+    ],
+    faisca: [
+      '{a} e {b} disputaram a atenção da plateia a noite inteira. A plateia ganhou.',
+    ],
+    neutro: [
+      '{a} e {b} fizeram o show sem grandes trocas. Profissionais.',
+    ],
+  },
   bico: {
     harmonia: [
       '{a} e {b} pegaram o mesmo turno extra e transformaram o cansaço em piada interna.',

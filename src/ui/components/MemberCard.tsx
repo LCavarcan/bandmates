@@ -105,6 +105,7 @@ export function MemberCard({ member, activity, disabled, unavailable = {}, onCho
           );
         })}
       </div>
+      {activity === 'show' && <p className="activity-show">🎤 No palco com a banda nesta semana</p>}
       <p className={`activity-hint ${unavailable[activity] ? 'activity-hint--warn' : ''}`}>
         {unavailable[activity] ?? ACTIVITIES[activity].description}
       </p>

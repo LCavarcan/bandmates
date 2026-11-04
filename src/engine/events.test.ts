@@ -65,10 +65,10 @@ describe('dados dos eventos', () => {
             }
   });
 
-  it('há entre 8 e 12 eventos principais', () => {
+  it('há pelo menos 8 eventos principais e mais eventos do que semanas', () => {
     const main = EVENTS.filter((e) => !e.followUp).length;
     expect(main).toBeGreaterThanOrEqual(8);
-    expect(main).toBeLessThanOrEqual(12);
+    expect(main).toBeGreaterThan(createNewGame(SEED).maxWeeks);
   });
 
   it('todos os desfechos de todos os eventos e conversas aplicam sem erro', () => {
@@ -101,9 +101,9 @@ describe('disparo de eventos', () => {
 
   it('o avanço de semana pode deixar um evento pendente, que bloqueia a semana seguinte', () => {
     let s = planAll(createNewGame(SEED), 'ensaiar');
-    s = advanceWeek(s).state; // semana 1: nenhum evento elegível (todos exigem semana ≥ 2)
-    expect(s.pendingEvent).toBeNull();
-    s = advanceWeek(s).state; // semana 2: Bia e Nina ensaiaram juntas
+    s = advanceWeek(s).state; // semana 1: o cartaz do festival
+    expect(s.pendingEvent?.id).toBe('o_cartaz');
+    s = advanceWeek(autoResolve(s)).state; // semana 2: Bia e Nina ensaiaram juntas
     expect(s.pendingEvent).not.toBeNull();
     expect(planIssues(s)).toContain('Há um acontecimento esperando sua decisão.');
     expect(() => advanceWeek(s)).toThrow();
@@ -111,7 +111,7 @@ describe('disparo de eventos', () => {
 
   it('um evento visto não se repete', () => {
     let s = planAll(createNewGame(SEED), 'ensaiar');
-    s = advanceWeek(advanceWeek(s).state).state;
+    s = advanceWeek(autoResolve(advanceWeek(s).state)).state;
     const first = s.pendingEvent!.id;
     s = autoResolve(s);
     for (let i = 0; i < 8; i++) {

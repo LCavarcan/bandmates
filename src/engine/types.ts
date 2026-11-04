@@ -17,7 +17,9 @@ export type TraitKey =
 
 export type EmotionKey = 'motivacao' | 'estresse' | 'confianca';
 
-export type ActivityId = 'ensaiar' | 'compor' | 'gravar' | 'descansar' | 'divulgar' | 'bico';
+export type ActivityId = 'ensaiar' | 'compor' | 'gravar' | 'descansar' | 'divulgar' | 'bico' | 'show';
+
+export type VenueId = 'bar' | 'porao' | 'calourada' | 'aurora' | 'festival';
 
 export type GenreId = 'indie' | 'pop' | 'alternativo' | 'punk';
 export type ThemeId =
@@ -125,7 +127,7 @@ export interface Delta {
   inverse?: boolean;
 }
 
-export type LogKind = 'member' | 'pair' | 'band' | 'song' | 'warning';
+export type LogKind = 'member' | 'pair' | 'band' | 'song' | 'show' | 'warning';
 
 export interface LogEntry {
   kind: LogKind;
@@ -174,7 +176,37 @@ export interface GameState {
   modifiers: Modifier[];
   /** Semana em que houve a última conversa (uma por semana). */
   talkedWeek: number | null;
+  /** Show marcado para esta semana (a banda inteira se apresenta). */
+  booking: { venue: VenueId } | null;
+  shows: ShowResult[];
+  /** Resultado da seletiva do festival (fim da campanha). */
+  festival: FestivalResult | null;
   finished: boolean;
+}
+
+export type ShowTier = 'memoravel' | 'bom' | 'morno' | 'desastre';
+
+export interface ShowResult {
+  week: number;
+  venue: VenueId;
+  score: number;
+  tier: ShowTier;
+  audience: number;
+  money: number;
+  fans: number;
+  reputation: number;
+  setlist: string[];
+  covers: number;
+}
+
+export type FestivalTier = 'selecionadas' | 'alternativo' | 'nao_foi';
+
+export interface FestivalResult {
+  score: number;
+  tier: FestivalTier;
+  components: { label: string; value: number; weight: number }[];
+  goalsDone: number;
+  goalsBonus: number;
 }
 
 export type FlagValue = boolean | number | string;
@@ -215,7 +247,10 @@ export type Condition =
   | { type: 'draft'; leader?: MemberId; minProgress?: number }
   /** Uma música foi lançada na semana que acabou. */
   | { type: 'released'; reception?: Reception[]; writer?: MemberId; notLeader?: MemberId }
-  | { type: 'songs'; status: SongStatus; min: number }
+  | { type: 'songs'; statuses: SongStatus[]; min: number }
+  | { type: 'shows'; min: number; minScore?: number }
+  /** Sinergia média entre todos os pares. */
+  | { type: 'unity'; min: number }
   | { type: 'chance'; p: number }
   | { type: 'all'; of: Condition[] }
   | { type: 'any'; of: Condition[] }

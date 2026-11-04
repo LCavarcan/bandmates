@@ -1,7 +1,7 @@
 import type { Delta } from '../../engine/types';
 
 /** Atributos de música: exibidos como valor absoluto, não como ganho/perda. */
-const INFO_LABELS = new Set(['Qualidade', 'Originalidade', 'Apelo', 'Coesão', 'Identidade', 'Gravação', 'Nota final']);
+const INFO_LABELS = new Set(['Qualidade', 'Originalidade', 'Apelo', 'Coesão', 'Identidade', 'Gravação', 'Nota final', 'Nota do show', 'Público']);
 
 export function DeltaChips({ deltas }: { deltas: Delta[] }) {
   if (!deltas.length) return null;

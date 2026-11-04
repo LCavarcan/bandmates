@@ -28,4 +28,4 @@ O diferencial é que as personagens devem parecer **pessoas**, não conjuntos de
 
 ## Campanha
 
-A temporada tem **12 semanas**. Nas próximas fases, ela termina com a seletiva de um festival local, e o que a banda construiu (músicas, fãs, reputação, relações) decide o resultado.
+A temporada tem **12 semanas** e termina com a **seletiva do Festival Maré Alta**. O que a banda construiu (apresentação, músicas, fãs, reputação, união e metas) decide o resultado, e um epílogo conta o que aconteceu com cada integrante. Veja [Shows e festival](../mecanicas/shows.md).

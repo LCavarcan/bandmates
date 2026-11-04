@@ -5,6 +5,7 @@ import { MEMBER_ORDER, MEMBERS } from '../data/members';
 import { PAIR_LINES } from '../data/pairs';
 import { MemberChanges, trait } from './changes';
 import { pickWeekEvent } from './events';
+import { bookFestival, FESTIVAL_VENUE, festivalResult, performerEffects, resolveShow, showMoneyRange } from './shows';
 import { activityMultiplier } from './narrative';
 import {
   composeContribution,
@@ -71,6 +72,7 @@ export function advanceWeek(prev: GameState): WeekResult {
     descansar: [],
     divulgar: [],
     bico: [],
+    show: [],
   };
   for (const id of MEMBER_ORDER) byActivity[s.plan[id]].push(id);
 
@@ -109,8 +111,19 @@ export function advanceWeek(prev: GameState): WeekResult {
     });
   }
 
-  // 2. Música: composição concluída, gravação concluída, lançamento, streaming
+  // 2. Show da semana (a banda inteira)
   const musicEntries: LogEntry[] = [];
+  let festivalPerformance: number | null = null;
+  if (s.booking) {
+    const { show, entry } = resolveShow(s, s.booking.venue, ctx.mf, ctx.changes, rng);
+    if (s.booking.venue === FESTIVAL_VENUE) festivalPerformance = show.score;
+    else ctx.money += show.money;
+    ctx.fans += show.fans;
+    ctx.reputation += show.reputation;
+    musicEntries.push(entry);
+  }
+
+  // 3. Música: composição concluída, gravação concluída, lançamento, streaming
   const composed = finishSongIfReady(ctx);
   if (composed) musicEntries.push(composed);
   const recorded = finishRecordingIfReady(ctx);
@@ -145,6 +158,9 @@ export function advanceWeek(prev: GameState): WeekResult {
   s.money += ctx.money;
   s.fans = Math.max(0, s.fans + ctx.fans);
   s.reputation = clamp(s.reputation + ctx.reputation);
+
+  // A avaliação do júri usa os números já atualizados com a própria seletiva.
+  if (festivalPerformance !== null) s.festival = festivalResult(s, festivalPerformance);
 
   if (s.money < 0) {
     for (const id of MEMBER_ORDER) {
@@ -182,8 +198,15 @@ export function advanceWeek(prev: GameState): WeekResult {
   // Evento narrativo da semana (não há eventos depois da última semana).
   if (s.week < s.maxWeeks) pickWeekEvent(s, s.week, rng);
 
+  // O show marcado vale só para esta semana.
+  if (s.booking) {
+    s.booking = null;
+    for (const id of MEMBER_ORDER) if (s.plan[id] === 'show') s.plan[id] = 'ensaiar';
+  }
+
   s.week += 1;
   if (s.week > s.maxWeeks) s.finished = true;
+  else if (s.week === s.maxWeeks) bookFestival(s);
   s.modifiers = s.modifiers.filter((m) => m.untilWeek >= s.week);
   s.seed = rng.seed();
   s.history = [...s.history, report].slice(-s.maxWeeks);
@@ -296,6 +319,10 @@ const RESOLVERS: Record<ActivityId, Resolver> = {
       c.emotion('estresse', 4);
       c.emotion('motivacao', -3);
     }
+  },
+
+  show(ctx, id) {
+    performerEffects(id, ctx.s.members[id], ctx.changes[id], ctx.mf[id], ctx.rng);
   },
 
   bico(ctx, id) {
@@ -458,6 +485,11 @@ export function estimateMoney(s: GameState): { min: number; max: number } {
   for (const song of s.songs) base += streamingFor(song, s.week).money;
   let min = base;
   let max = base;
+  if (s.booking && s.booking.venue !== FESTIVAL_VENUE) {
+    const r = showMoneyRange(s, s.booking.venue);
+    min += r.min;
+    max += r.max;
+  }
   for (const id of MEMBER_ORDER) {
     const act = s.plan[id];
     min -= ACTIVITIES[act].cost;

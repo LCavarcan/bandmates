@@ -6,9 +6,7 @@ Os eventos são **cenas escritas à mão**, disparadas por condições do jogo. 
 
 ## Como um evento acontece
 
-1. No fim de cada semana (exceto a última), o motor procura **um** evento:
-    - primeiro, uma **continuação agendada** que tenha vencido;
-    - senão, entre os eventos comuns **ainda não vistos** cuja condição de ativação é verdadeira, vence o de **maior prioridade** (em caso de empate, um sorteio com a semente do jogo).
+1. No fim de cada semana (exceto a última), o motor procura **um** evento. Os candidatos são as **continuações agendadas** que venceram (prioridade 9) e os eventos comuns **ainda não vistos** cuja condição de ativação é verdadeira. Vence a **maior prioridade**; em caso de empate, um sorteio com a semente do jogo. Uma continuação que perde volta na semana seguinte. *O cartaz* e a *Véspera* têm prioridade 10.
 2. O evento fica **pendente** e aparece logo depois do resumo da semana.
 3. Enquanto houver um evento pendente, não é possível avançar a semana nem conversar.
 4. Cada evento acontece **no máximo uma vez** por campanha.
@@ -30,7 +28,9 @@ As condições são dados, não código. Elas se combinam com `all`, `any` e `no
 | `together` | as duas fizeram a mesma atividade (dentre as listadas) |
 | `draft` | há música em composição (opcionalmente com essa líder e progresso mínimo) |
 | `released` | uma música foi lançada na semana (filtros: recepção, autora, "não liderada por") |
-| `songs` | há pelo menos N músicas num estado |
+| `songs` | há pelo menos N músicas em um dos estados listados |
+| `shows` | houve pelo menos N shows (opcionalmente com nota mínima), sem contar a seletiva |
+| `unity` | a sinergia média dos 6 pares é pelo menos `min` |
 | `chance` | sorteio com probabilidade `p` (só na ativação) |
 
 ## Efeitos
@@ -72,12 +72,18 @@ Os **modificadores** multiplicam o fator de disposição (`mf`) na atividade, o 
 | **A resenha** | Lia | Lançamento da Lia com recepção morna ou boa | Mostrar com os comentários bons · "crítica faz parte" (Lia +20% ou −20% compondo, conforme a confiança) · esconder (agenda *Você sabia?*) |
 | ↳ *Você sabia?* | Lia | 2 semanas depois | Admitir · "não queria te magoar" (depende da confiança) |
 | **Ensaiar ou aparecer?** | Júlia, Nina | Semana ≥ 5; Júlia divulgou; rivalidade ≥ 15 | Lado da Júlia (+25% divulgação) · lado da Nina (+25% ensaio e gravação) · trocar de lugar (+respeito, +habilidades) |
+| **O cartaz** | Todas | Semana 1 (sempre) | Apresenta a seletiva: com tudo · uma música boa primeiro · shows primeiro |
+| **Depois do primeiro show** | Todas | No primeiro show | Comemorar (−R$ 40, −estresse) · avaliar (+10% no ensaio) · acalmar a Nina |
+| **Véspera** | Todas | Semana 11 (prioridade máxima) | Discurso (+5% na seletiva) · ensaio de madrugada (+12%, +estresse) · dormir cedo (−estresse) |
+| Arco Lia & Nina | Lia, Nina | Veja [Romance](romance.md) | *Ela sempre fez isso?* · *Apagão* · *Você acha que eu devia?* · ↳ *No telhado* · ↳ *As outras perceberam* |
 
-São 9 eventos principais e 4 continuações. Como cada evento só acontece uma vez e depende do estado, **nenhuma campanha vê todos**.
+São 15 eventos principais e 6 continuações. Como cada evento só acontece uma vez, há no máximo um por semana e cada um depende do estado, **nenhuma campanha vê todos**.
 
-### Flags plantadas para a Fase 4
+### Flags com efeito posterior
 
-Estas flags ainda não têm efeito, mas vão alimentar o arco romântico e os finais: `lia_sente_algo`, `lia_nina_momento`, `lia_segredo_compartilhado`, `lia_confiou`, `mentiu_caderno`, `julia_dividiu`, `julia_protagonista`, `bia_plano`, `fez_jingle`, `trocaram_de_lugar`.
+- **Romance:** `lia_sente_algo`, `lia_nina_momento`, `nina_curiosa`, `apagao_juntas`, `romance` (veja [Romance](romance.md)).
+- **Epílogos:** `julia_dividiu`, `julia_protagonista`, `lia_confiou`, `bia_plano`, `nina_ignorada`, `trocaram_de_lugar`.
+- **Reservadas para expansões:** `lia_segredo_compartilhado`, `mentiu_caderno`, `fez_jingle`, `banda_sabe`.
 
 ## Conversas
 

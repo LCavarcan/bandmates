@@ -46,3 +46,19 @@ Registro curto das decisões de design e de técnica que não estavam especifica
 | Entrosamento na gravação limitado a ±15% | Relevante sem dominar a habilidade |
 | Retratos da cena "congelados" ao abrir | A expressão não muda no meio da leitura quando a escolha altera as emoções |
 | Flags plantadas para o romance (Lia e Nina), sem efeito ainda | O arco da Fase 4 começa a partir de escolhas já feitas, sem retrabalho |
+
+## Fase 4
+
+| Decisão | Motivo |
+|---|---|
+| Show ocupa a semana da banda inteira | Custo de oportunidade claro: dinheiro e fãs agora contra música depois |
+| Setlist com covers quando faltam músicas | Permite fazer shows desde a semana 1 (renda), mas covers rendem pouca reputação |
+| Lapidação dos ensaios entra no show | Dá ao ensaio um papel direto na carreira |
+| Requisitos e intervalo por casa | Progressão (casas maiores exigem fãs e reputação) sem repetir o mesmo show toda semana |
+| Seletiva automática na semana 12, sem cancelamento | Objetivo claro e inevitável |
+| Avaliação do júri com 5 componentes + metas | Nenhum caminho único vence: apresentação, música, público, reputação e união pesam |
+| Metas valem +3 cada | Progressão visível e marcos intermediários |
+| Romance entre Lia e Nina | O par que já tinha a melhor base (silêncio confortável, respeito) e o contraste mais interessante (intuição × controle) |
+| Reciprocidade testada no momento da declaração | "Não transforme uma relação em romance só porque um número passou de um limite": é preciso passar pelas cenas, e a resposta pode ser não |
+| A amizade tem epílogo próprio | Final válido, não "fracasso" |
+| Continuações e eventos disputam por prioridade | A *Véspera* (prioridade 10) nunca é atropelada; uma continuação que perde volta na semana seguinte |

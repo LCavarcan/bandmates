@@ -52,6 +52,9 @@ Os traços vão de 0 a 100, e só os relevantes de cada personagem são definido
 - **Temas pessoais:** recomeço (75).
 - **No jogo:** ganha mais técnica nos ensaios e se estressa mais. Descansa pela metade ("não sabe parar"). A direção experimental a deixa tensa.
 
+!!! note "Romance"
+    O arco romântico opcional do MVP é entre **Lia e Nina**. Veja [Romance](../mecanicas/romance.md).
+
 ## Relações iniciais
 
 | Par | História | Afin. | Resp. | Conf. | Rival. |

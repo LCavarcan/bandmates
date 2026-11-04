@@ -107,7 +107,7 @@ describe('atividades', () => {
 
   it('descansar reduz estresse — mas a disciplinada Nina descansa menos', () => {
     let s = planAll(createNewGame(SEED), 'ensaiar');
-    s = advanceWeek(s).state; // sobe o estresse
+    s = autoResolve(advanceWeek(s).state); // sobe o estresse
     const rested = advanceWeek(planAll(s, 'descansar')).state;
     const drop = (id: 'bia' | 'nina') => s.members[id].emotions.estresse - rested.members[id].emotions.estresse;
     expect(drop('bia')).toBeGreaterThan(0);
@@ -198,7 +198,7 @@ describe('salvamento', () => {
 
   it('salvar e carregar preserva a campanha', () => {
     const store = memoryStore();
-    const s = advanceWeek(advanceWeek(createNewGame(SEED)).state).state;
+    const s = step(step(createNewGame(SEED)));
     saveGame(store, s);
     expect(loadGame(store)).toEqual(s);
   });

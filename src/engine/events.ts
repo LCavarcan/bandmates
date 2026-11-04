@@ -11,23 +11,24 @@ export function seenEvent(s: GameState, id: string): boolean {
 /**
  * Escolhe o evento da semana que acabou (`week`), se houver. Muta `s`:
  * consome agendamentos vencidos e define `pendingEvent`.
- * Ordem: continuações agendadas vencidas → eventos comuns elegíveis (maior prioridade; empate sorteado).
+ * Candidatos: continuações agendadas vencidas + eventos comuns elegíveis ainda não vistos.
+ * Vence a maior prioridade (empate sorteado). Continuações vencidas que perderem voltam na semana seguinte.
  */
 export function pickWeekEvent(s: GameState, week: number, rng: Rng): EventDef | null {
-  const due = s.scheduled.filter((x) => x.week <= week);
+  const due = s.scheduled.filter((x) => x.week <= week && EVENTS_BY_ID[x.event] && !seenEvent(s, x.event));
   s.scheduled = s.scheduled.filter((x) => x.week > week);
-  // Se duas continuações vencerem juntas, a segunda volta para a semana seguinte.
-  const [first, ...rest] = due.filter((x) => EVENTS_BY_ID[x.event] && !seenEvent(s, x.event));
-  for (const r of rest) s.scheduled.push({ event: r.event, week: week + 1 });
 
-  let chosen: EventDef | null = first ? EVENTS_BY_ID[first.event] : null;
-  if (!chosen) {
-    const eligible = EVENTS.filter((e) => !e.followUp && !seenEvent(s, e.id) && (!e.trigger || evaluate(e.trigger, s, week, rng)));
-    if (eligible.length) {
-      const top = Math.max(...eligible.map((e) => e.priority));
-      chosen = rng.pick(eligible.filter((e) => e.priority === top));
-    }
+  const candidates: EventDef[] = [
+    ...due.map((x) => EVENTS_BY_ID[x.event]),
+    ...EVENTS.filter((e) => !e.followUp && !seenEvent(s, e.id) && (!e.trigger || evaluate(e.trigger, s, week, rng))),
+  ];
+  let chosen: EventDef | null = null;
+  if (candidates.length) {
+    const top = Math.max(...candidates.map((e) => e.priority));
+    chosen = rng.pick(candidates.filter((e) => e.priority === top));
   }
+  for (const d of due) if (d.event !== chosen?.id) s.scheduled.push({ event: d.event, week: week + 1 });
+
   s.pendingEvent = chosen ? { id: chosen.id, week } : null;
   return chosen;
 }

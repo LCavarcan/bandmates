@@ -68,6 +68,8 @@ nav:
       - Ciclo musical: mecanicas/musica.md
       - Relações: mecanicas/relacoes.md
       - Eventos e conversas: mecanicas/eventos.md
+      - Shows e festival: mecanicas/shows.md
+      - Romance: mecanicas/romance.md
       - Economia: mecanicas/economia.md
   - Desenvolvimento:
       - Arquitetura: dev/arquitetura.md

@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { FESTIVAL_TIERS } from '../../data/campaign';
 import { MEMBER_ORDER, MEMBERS } from '../../data/members';
-import { describeRelation } from '../../engine';
+import { describeRelation, epilogue } from '../../engine';
 import type { GameState } from '../../engine/types';
 import { moodOf, Portrait } from '../art/Portrait';
 import { fmtMoney } from './TopBar';
@@ -26,7 +27,9 @@ export function TitleScreen({
         ))}
       </div>
       <h1 className="logo">Bandmates</h1>
-      <p className="title-screen__tag">Quatro garotas, um estúdio alugado e doze semanas para virar uma banda de verdade.</p>
+      <p className="title-screen__tag">
+        Quatro garotas, um estúdio alugado e doze semanas até a seletiva do Festival Maré Alta.
+      </p>
       <div className="title-screen__actions">
         {saved && !saved.finished && (
           <button className="primary-btn" onClick={onContinue}>
@@ -35,14 +38,18 @@ export function TitleScreen({
         )}
         {saved && saved.finished && (
           <button className="primary-btn" onClick={onContinue}>
-            Ver fim da temporada
+            Ver o final da temporada
           </button>
         )}
         {confirming ? (
           <div className="confirm">
             <span>Isso apaga a campanha salva. Tem certeza?</span>
-            <button className="danger-btn" onClick={onNew}>Sim, começar do zero</button>
-            <button className="ghost-btn" onClick={() => setConfirming(false)}>Cancelar</button>
+            <button className="danger-btn" onClick={onNew}>
+              Sim, começar do zero
+            </button>
+            <button className="ghost-btn" onClick={() => setConfirming(false)}>
+              Cancelar
+            </button>
           </div>
         ) : (
           <button className={saved ? 'ghost-btn' : 'primary-btn'} onClick={() => (saved ? setConfirming(true) : onNew())}>
@@ -56,49 +63,91 @@ export function TitleScreen({
 }
 
 export function SeasonEnd({ state, onNew, onMenu }: { state: GameState; onNew: () => void; onMenu: () => void }) {
-  const rank = (s: GameState['songs'][number]) => s.score ?? (s.quality + s.originality) / 2;
-  const best = [...state.songs].sort((a, b) => rank(b) - rank(a))[0];
+  const f = state.festival;
+  const tier = f ? FESTIVAL_TIERS[f.tier] : null;
+  const ep = epilogue(state);
   const released = state.songs.filter((s) => s.status === 'lancada').length;
+  const best = [...state.songs].sort((a, b) => (b.score ?? b.quality * 0.8) - (a.score ?? a.quality * 0.8))[0];
+
   return (
-    <section className="season-end">
-      <p className="eyebrow">Fim da temporada</p>
-      <h2>Doze semanas depois…</h2>
+    <section className={`season-end ${f ? `season-end--${f.tier}` : ''}`}>
+      <p className="eyebrow">Seletiva do Festival Maré Alta</p>
+      <h2>{tier ? tier.title : 'Fim da temporada'}</h2>
+      {tier && <p className="season-end__verdict">{tier.text}</p>}
+
+      {f && (
+        <div className="jury">
+          <h3>Avaliação do júri · {f.score}</h3>
+          <ul>
+            {f.components.map((c) => (
+              <li key={c.label}>
+                <span>{c.label}</span>
+                <span className="jury__bar">
+                  <span style={{ width: `${c.value}%` }} />
+                </span>
+                <span className="jury__value">
+                  {c.value} <span className="muted small">×{c.weight}</span>
+                </span>
+              </li>
+            ))}
+            <li>
+              <span>Metas cumpridas ({f.goalsDone})</span>
+              <span />
+              <span className="jury__value">+{f.goalsBonus}</span>
+            </li>
+          </ul>
+        </div>
+      )}
+
       <div className="season-end__stats">
         <div><strong>{state.fans}</strong><span>fãs</span></div>
         <div><strong>{fmtMoney(state.money)}</strong><span>em caixa</span></div>
         <div><strong>{state.reputation}</strong><span>reputação</span></div>
         <div><strong>{state.songs.length}</strong><span>músicas ({released} lançadas)</span></div>
+        <div><strong>{state.shows.length}</strong><span>shows</span></div>
       </div>
       {best && (
         <p>
-          A música mais marcante foi <strong>“{best.title}”</strong>
-          {best.score !== null ? ` (nota ${best.score})` : ` (qualidade ${best.quality}, originalidade ${best.originality})`}.
+          A música que mais marcou a temporada foi <strong>“{best.title}”</strong>.
         </p>
       )}
-      <div className="season-end__band">
-        {MEMBER_ORDER.map((id) => (
-          <div key={id} className="season-end__member">
-            <Portrait profile={MEMBERS[id]} mood={moodOf(state.members[id])} size={90} />
-            <span>{MEMBERS[id].name}</span>
-          </div>
+
+      <h3>Epílogo</h3>
+      <ul className="epilogue">
+        {ep.members.map(({ id, text }) => (
+          <li key={id} style={{ ['--c' as string]: MEMBERS[id].color }}>
+            <span className="epilogue__portrait">
+              <Portrait profile={MEMBERS[id]} mood={moodOf(state.members[id])} size={72} />
+            </span>
+            <span>
+              <strong>{MEMBERS[id].name}.</strong> {text}
+            </span>
+          </li>
         ))}
-      </div>
-      <ul className="season-end__relations">
-        {Object.entries(state.relations).map(([k, r]) => {
-          const [a, b] = k.split('|') as (keyof typeof MEMBERS)[];
-          return (
-            <li key={k}>
-              {MEMBERS[a].name} & {MEMBERS[b].name}: <em>{describeRelation(r).label}</em>
-            </li>
-          );
-        })}
       </ul>
-      <p className="muted small">
-        Nas próximas versões, a temporada termina com a seletiva do festival — e o que vocês construíram decide o resultado.
-      </p>
+      {ep.romance && <p className="epilogue__romance">💜 {ep.romance}</p>}
+
+      <details className="season-end__relations">
+        <summary>Como ficaram as relações</summary>
+        <ul>
+          {Object.entries(state.relations).map(([k, r]) => {
+            const [a, b] = k.split('|') as (keyof typeof MEMBERS)[];
+            return (
+              <li key={k}>
+                {MEMBERS[a].name} & {MEMBERS[b].name}: <em>{describeRelation(r).label}</em>
+              </li>
+            );
+          })}
+        </ul>
+      </details>
+
       <div className="title-screen__actions">
-        <button className="primary-btn" onClick={onNew}>Nova campanha</button>
-        <button className="ghost-btn" onClick={onMenu}>Menu</button>
+        <button className="primary-btn" onClick={onNew}>
+          Nova campanha
+        </button>
+        <button className="ghost-btn" onClick={onMenu}>
+          Menu
+        </button>
       </div>
     </section>
   );

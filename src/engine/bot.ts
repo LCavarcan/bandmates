@@ -2,7 +2,9 @@
 import { MEMBER_ORDER } from '../data/members';
 import { eventChoices, resolveEvent } from './events';
 import { planIssues, recordingTarget, setRelease, startSong } from './music';
+import { bookingBlocker, setBooking } from './shows';
 import { setActivity } from './state';
+import { VENUE_ORDER } from '../data/venues';
 import type { ActivityId, GameState, MemberId, SongConcept, WeekReport } from './types';
 import { advanceWeek } from './week';
 
@@ -13,6 +15,8 @@ export interface BotOptions {
   concept: BotConcept;
   /** Número de integrantes divulgando na semana de lançamento. */
   promoters?: number;
+  /** false = nunca marca shows. */
+  shows?: boolean;
 }
 
 /** Resolve o evento pendente (se houver) com a primeira escolha disponível. */
@@ -31,6 +35,15 @@ export function botPlan(s: GameState, opt: BotOptions): GameState {
   }
   const releasable = st.songs.find((x) => x.status === 'gravada');
   st = setRelease(st, releasable ? releasable.id : null);
+
+  // Semana da seletiva: a banda já está escalada.
+  if (st.booking) return st;
+
+  // Show quando o caixa aperta ou a cada quatro semanas, na maior casa disponível.
+  if (opt.shows !== false && (st.money < 150 || st.week % 4 === 0)) {
+    const venue = [...VENUE_ORDER].reverse().find((v) => !bookingBlocker(st, v));
+    if (venue) return setBooking(st, venue);
+  }
 
   const plan = {} as Record<MemberId, ActivityId>;
   const free = [...MEMBER_ORDER];

@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.4.0 — Fase 4: campanha
+
+### Novo
+
+- **Shows** em quatro casas, com requisitos de fãs e reputação, intervalo entre apresentações, gênero preferido, setlist (com covers quando faltam músicas), nota, público, cachê, fãs e reputação, que pode cair.
+- **Seletiva do Festival Maré Alta** na semana 12: avaliação do júri em cinco componentes, mais metas.
+- **Painel "Rumo ao Maré Alta"** com contagem regressiva e 7 metas.
+- **Eventos de campanha:** *O cartaz* (semana 1), *Depois do primeiro show*, *Véspera* (semana 11).
+- **Arco romântico opcional entre Lia e Nina** (5 eventos), com reciprocidade e a amizade como final possível.
+- **Tela final** com o resultado do júri, as estatísticas, um epílogo por integrante e o epílogo do arco.
+- Páginas de documentação: *Shows e festival* e *Romance*.
+
+### Alterado
+
+- Continuações e eventos comuns agora disputam por prioridade.
+- O save passou para a **versão 4**, com migração.
+- O bot de testes marca shows.
+
 ## 0.3.0 — Fase 3: personagens e relações
 
 ### Novo

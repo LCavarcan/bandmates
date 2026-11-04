@@ -13,6 +13,7 @@ src/
     narrative.ts       avaliador de condições e aplicador de efeitos (dados → estado)
     events.ts          seleção e resolução de eventos
     talk.ts            conversa da semana
+    shows.ts           agendamento, show, metas, festival, epílogos
     changes.ts         MemberChanges: aplica e registra deltas
     save.ts            serialização, versão e migrações
     rng.ts             gerador pseudoaleatório com semente (mulberry32)
@@ -26,6 +27,8 @@ src/
     events.ts          eventos narrativos (cenas, escolhas, desfechos)
     talks.ts           conversas por personagem e abordagem
     dsl.ts             atalhos para escrever eventos como dados
+    venues.ts          casas de show e faixas de nota
+    campaign.ts        metas, pesos do júri, resultados, epílogos
     labels.ts          rótulos de interface
   ui/
     App.tsx            orquestra o estado e os modais
@@ -48,6 +51,8 @@ A interface chama funções que **recebem o estado e devolvem um novo estado**, 
 | `planIssues(state)` | lista de problemas que bloqueiam o avanço |
 | `resolveEvent(state, choiceId)` | `{ state, result, entries }` |
 | `talk(state, member, approach)` | `{ state, result, entries }` |
+| `setBooking(state, venue \| null)` | novo estado (a banda inteira escalada) |
+| `festivalResult`, `epilogue`, `goalsStatus` | leitura do estado |
 
 Internamente, `advanceWeek` faz um `structuredClone` e trabalha na cópia.
 

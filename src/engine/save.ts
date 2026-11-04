@@ -72,6 +72,19 @@ const MIGRATIONS: Record<number, (state: any) => any> = {
     st.version = 3;
     return st;
   },
+  // v3 → v4: shows, seletiva do festival.
+  3: (st) => {
+    st.booking = null;
+    st.shows = [];
+    st.festival = null;
+    // Saves que já estavam na semana da seletiva entram nela com a banda escalada.
+    if (!st.finished && st.week === st.maxWeeks) {
+      st.booking = { venue: 'festival' };
+      for (const k of Object.keys(st.plan)) st.plan[k] = 'show';
+    }
+    st.version = 4;
+    return st;
+  },
 };
 
 function migrate(version: number, state: GameState): GameState | null {

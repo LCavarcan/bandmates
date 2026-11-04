@@ -358,6 +358,9 @@ export function planIssues(s: GameState): string[] {
   const acts = MEMBER_ORDER.map((id) => s.plan[id]);
   if (acts.includes('compor') && !s.draft) issues.push('Defina a nova música antes de escalar alguém para compor.');
   if (acts.includes('gravar') && !recordingTarget(s)) issues.push('Não há música composta esperando gravação.');
+  const allShow = acts.every((a) => a === 'show');
+  if (s.booking && !allShow) issues.push('Show marcado: a banda inteira precisa estar no palco.');
+  if (!s.booking && acts.includes('show')) issues.push('Nenhum show marcado para esta semana.');
   return issues;
 }
 

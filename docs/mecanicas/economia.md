@@ -18,6 +18,7 @@ Constantes: `ECONOMY` e `ACTIVITIES[*].cost`, em `src/data/activities.ts`.
 | Divulgar (por integrante) | −R$ 40 |
 | Gravar (por integrante) | −R$ 50 |
 | Trabalho extra (por integrante) | +R$ 110 a 140 (−R$ 40 se atrasar) |
+| Show (banda inteira) | Cachê + bilheteria; veja [Shows](shows.md#resultado) |
 | Streaming | Veja [Ciclo musical](musica.md#streaming) |
 
 O painel **Plano da semana** mostra a previsão de caixa, com aluguel, custos, trabalho extra e o streaming da semana, que é determinístico.
@@ -26,4 +27,4 @@ O painel **Plano da semana** mostra a previsão de caixa, com aluguel, custos, t
 
 Sem renda, o caixa inicial dura cerca de quatro semanas. Isso cria a decisão de **quem vai pagar as contas**: tirar alguém da música para o trabalho extra custa motivação e estresse, e afeta mais a ambiciosa Júlia. O streaming alivia, mas só depois de compor, gravar e lançar.
 
-Na Fase 4, os **shows** vão virar a principal fonte de dinheiro.
+Os **shows** são a principal fonte de dinheiro: um show no Bar do Zé rende de R$ 200 a 250, mas ocupa a semana inteira da banda. O ritmo típico é alternar shows com semanas de composição e gravação.

@@ -8,12 +8,13 @@ Ao clicar em **Avançar semana**, a simulação segue esta ordem:
 
 1. **Validação do plano.** Compor sem música definida, gravar sem música composta ou ter um evento pendente bloqueia o avanço (`planIssues`).
 2. **Atividades individuais**, na ordem Júlia, Lia, Bia, Nina.
-3. **Música:** composição concluída → gravação concluída → streaming das músicas já lançadas → lançamento marcado.
-4. **Duplas:** cada par na mesma atividade interage (veja [Relações](relacoes.md)).
-5. **Custos fixos:** aluguel. Se o caixa ficar negativo, todas perdem motivação.
-6. **Alertas** de estresse e motivação.
-7. **Evento da semana:** no máximo um, exceto na última semana (veja [Eventos e conversas](eventos.md)).
-8. A semana avança. Os modificadores vencidos são removidos. Ao passar da semana 12, a temporada termina.
+3. **Show**, se houver um marcado (veja [Shows e festival](shows.md)).
+4. **Música:** composição concluída → gravação concluída → streaming das músicas já lançadas → lançamento marcado.
+5. **Duplas:** cada par na mesma atividade interage (veja [Relações](relacoes.md)).
+6. **Custos fixos:** aluguel. Se o caixa ficar negativo, todas perdem motivação.
+7. **Alertas** de estresse e motivação. Na seletiva, o júri faz a avaliação.
+8. **Evento da semana:** no máximo um, exceto na última semana (veja [Eventos e conversas](eventos.md)).
+9. A semana avança. O show marcado é desfeito (a banda volta a ensaiar), e os modificadores vencidos são removidos. Ao entrar na semana 12, a banda é escalada para a seletiva. Ao passar da semana 12, a temporada termina.
 
 A simulação usa um gerador pseudoaleatório com semente salva no estado. Com a mesma semente e o mesmo plano, o resultado é sempre o mesmo.
 
@@ -86,6 +87,10 @@ Custa **R$ 40**.
 - Ganha `R$ 110 + rng(0..30)`. Impulsivas têm 20% de chance de chegar atrasadas (−R$ 40).
 - Estresse +10, ou +7 para disciplinadas.
 - Motivação −5, ou −9 para ambiciosas.
+
+### 🎤 Show
+
+Não é escolhido por integrante: é marcado no painel **Shows** e escala a banda inteira. Veja [Shows e festival](shows.md).
 
 ## 💬 Conversar
 

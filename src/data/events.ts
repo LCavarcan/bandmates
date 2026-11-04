@@ -11,9 +11,11 @@ import {
   emotionMin,
   flag,
   hasDraft,
+  hasFlag,
   modifier,
   moneyMax,
   narr,
+  not,
   rel,
   relMax,
   relMin,
@@ -23,6 +25,7 @@ import {
   schedule,
   skill,
   together,
+  weekIs,
   weekMin,
 } from './dsl';
 
@@ -913,6 +916,451 @@ export const EVENTS: EventDef[] = [
               narr('Nina distribui panfletos e descobre que as pessoas gostam quando ela explica a linha de baixo.'),
               narr('Nenhuma das duas admite que aprendeu alguma coisa.'),
             ],
+          },
+        ],
+      },
+    ],
+  },
+  // =========================================================================
+  // Campanha (Fase 4)
+  {
+    id: 'o_cartaz',
+    title: 'O cartaz',
+    cast: ['julia', 'lia', 'bia', 'nina'],
+    priority: 10,
+    trigger: weekIs(1),
+    scene: [
+      narr('Na porta do porão, alguém colou um cartaz:'),
+      narr('SELETIVA FESTIVAL MARÉ ALTA — INSCRIÇÕES ABERTAS. APRESENTAÇÃO FINAL EM ONZE SEMANAS.'),
+      say('julia', 'Onze semanas. A gente consegue.'),
+      say('nina', 'A gente tem zero músicas gravadas.'),
+      say('bia', 'Por enquanto!'),
+      narr('Lia não diz nada. Fica um tempo olhando o cartaz, como se estivesse decorando.'),
+    ],
+    choices: [
+      {
+        id: 'tudo',
+        label: '“Vamos com tudo.”',
+        hint: 'Todo mundo se anima. Nem todo mundo dorme.',
+        outcomes: [
+          {
+            effects: [emo('julia', 'motivacao', 4), emo('lia', 'motivacao', 4), emo('bia', 'motivacao', 4), emo('nina', 'motivacao', 4), emo('nina', 'estresse', 4)],
+            result: [say('julia', 'É isso!'), narr('Bia já está batucando a contagem regressiva na parede. Nina abre uma planilha nova chamada “Maré Alta (FINAL) (v1)”.')],
+          },
+        ],
+      },
+      {
+        id: 'musica',
+        label: '“Um passo de cada vez. Primeiro, uma música boa.”',
+        outcomes: [
+          {
+            effects: [emo('lia', 'motivacao', 5), emo('nina', 'estresse', -4), emo('julia', 'motivacao', -2)],
+            result: [say('lia', 'Eu tenho umas ideias.'), narr('É a frase mais longa que ela disse a semana inteira.')],
+          },
+        ],
+      },
+      {
+        id: 'palco',
+        label: '“Primeiro, aprender a tocar ao vivo. Vamos marcar shows.”',
+        outcomes: [
+          {
+            effects: [emo('julia', 'motivacao', 5), emo('bia', 'motivacao', 4), emo('lia', 'estresse', 5)],
+            result: [say('bia', 'Eu conheço o Zé do bar!'), say('nina', 'Todo mundo conhece o Zé do bar.'), narr('Lia vai ficando um pouco mais pálida a cada frase.')],
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 'depois_do_primeiro_show',
+    title: 'Depois do primeiro show',
+    cast: ['bia', 'julia', 'nina', 'lia'],
+    priority: 7,
+    trigger: all(did('julia', 'show'), not({ type: 'shows', min: 2 })),
+    scene: [
+      narr('O camarim é um depósito de engradados. A banda divide uma garrafa d’água e aquele silêncio estranho de depois.'),
+      say('bia', 'A GENTE FEZ UM SHOW.'),
+      say('julia', 'A gente fez um show!'),
+      say('nina', 'Eu errei a entrada da terceira.'),
+      say('lia', 'Ninguém percebeu.'),
+      say('nina', 'Eu percebi.'),
+    ],
+    choices: [
+      {
+        id: 'pastel',
+        label: 'Comemorar: pastel para todo mundo',
+        hint: 'R$ 40 bem gastos.',
+        outcomes: [
+          {
+            effects: [res('money', -40), emo('julia', 'estresse', -5), emo('lia', 'estresse', -5), emo('bia', 'estresse', -5), emo('nina', 'estresse', -5), rel('bia', 'julia', { afinidade: 2 }), rel('lia', 'nina', { afinidade: 2 })],
+            result: [narr('Às duas da manhã, na calçada da pastelaria, a Bia imita a cara do Zé quando a guitarra microfonou. Até a Nina ri.')],
+          },
+        ],
+      },
+      {
+        id: 'avaliar',
+        label: 'Fazer uma avaliação rápida do show',
+        outcomes: [
+          {
+            effects: [modifier(null, 'ensaiar', 1.1, 2, 'Aprendendo com o palco'), emo('nina', 'estresse', -3), emo('bia', 'motivacao', -2)],
+            result: [narr('Nina já tinha anotado tudo. Em tópicos. Com horário.'), say('bia', 'Você anotou durante o show?'), say('nina', 'Entre as músicas.')],
+          },
+        ],
+      },
+      {
+        id: 'nina',
+        label: 'Dizer à Nina que um erro não define um show',
+        outcomes: [
+          {
+            when: emotionMin('nina', 'confianca', 45),
+            effects: [emo('nina', 'confianca', 5), emo('nina', 'estresse', -6)],
+            result: [say('nina', '…Eu sei. Eu sei que sei. É que às vezes eu esqueço.')],
+          },
+          {
+            effects: [emo('nina', 'confianca', 2)],
+            result: [narr('Ela concorda com a cabeça. Não acredita. Mas guarda a frase para depois.')],
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 'vespera',
+    title: 'Véspera',
+    cast: ['julia', 'lia', 'bia', 'nina'],
+    priority: 10,
+    trigger: weekIs(11),
+    scene: [
+      narr('Véspera da seletiva. O estúdio está mais silencioso do que nunca.'),
+      say('julia', 'Amanhã a gente…'),
+      say('bia', 'Não fala. Dá azar.'),
+      narr('Nina confere o setlist pela décima vez. Lia está sentada no chão, abraçada à guitarra.'),
+    ],
+    choices: [
+      {
+        id: 'discurso',
+        label: 'Fazer um discurso',
+        outcomes: [
+          {
+            effects: [emo('julia', 'motivacao', 5), emo('lia', 'motivacao', 5), emo('bia', 'motivacao', 5), emo('nina', 'motivacao', 5), modifier(null, 'show', 1.05, 1, 'Discurso da véspera')],
+            result: [narr('Você não lembra direito o que disse. Elas lembram. A Júlia vai repetir uma frase sua em entrevistas durante anos.')],
+          },
+        ],
+      },
+      {
+        id: 'ensaio',
+        label: 'Um último ensaio, de madrugada',
+        hint: 'Afiadas. E cansadas.',
+        outcomes: [
+          {
+            effects: [emo('julia', 'estresse', 8), emo('lia', 'estresse', 8), emo('bia', 'estresse', 8), emo('nina', 'estresse', 8), modifier(null, 'show', 1.12, 1, 'Afiadas para a seletiva')],
+            result: [narr('Às três da manhã, o setlist inteiro sai sem um erro. A Nina finalmente desliga o metrônomo.')],
+          },
+        ],
+      },
+      {
+        id: 'dormir',
+        label: 'Mandar todo mundo dormir cedo',
+        outcomes: [
+          {
+            effects: [emo('julia', 'estresse', -12), emo('lia', 'estresse', -12), emo('bia', 'estresse', -12), emo('nina', 'estresse', -12)],
+            result: [narr('Ninguém dorme cedo. Mas todo mundo tenta, e isso já ajuda.')],
+          },
+        ],
+      },
+    ],
+  },
+
+  // =========================================================================
+  // Arco romântico opcional: Lia & Nina
+  {
+    id: 'ela_sempre_fez_isso',
+    title: 'Ela sempre fez isso?',
+    cast: ['nina', 'lia'],
+    priority: 5,
+    trigger: all(weekMin(4), relMin('lia', 'nina', 'afinidade', 30), any(hasFlag('lia_nina_momento'), together('lia', 'nina', 'ensaiar', 'compor', 'gravar'))),
+    scene: [
+      narr('Nina espera a Lia sair para buscar café e se aproxima de você, fingindo que veio pegar um cabo.'),
+      say('nina', 'Pergunta rápida. A Lia… ela sempre fez isso de cantarolar enquanto afina?'),
+      narr('Você nunca tinha reparado. Pelo visto, a Nina reparou bastante.'),
+      say('nina', 'Esquece. É que atrapalha a afinação. Só isso.'),
+    ],
+    choices: [
+      {
+        id: 'confia',
+        label: 'Dizer que a Lia só faz isso perto de quem confia',
+        outcomes: [
+          {
+            effects: [flag('nina_curiosa'), rel('lia', 'nina', { confianca: 3 }), emo('nina', 'estresse', 2)],
+            result: [say('nina', 'Ah.'), narr('Uma pausa.'), say('nina', 'Tá.'), narr('Ela volta para o baixo. Erra a afinação duas vezes.')],
+          },
+        ],
+      },
+      {
+        id: 'porque',
+        label: 'Perguntar por que ela quer saber',
+        outcomes: [
+          {
+            when: emotionMin('nina', 'confianca', 50),
+            effects: [flag('nina_curiosa'), emo('nina', 'estresse', -2)],
+            result: [
+              say('nina', 'Porque eu não consigo parar de prestar atenção. E eu presto atenção em tudo, então isso não quer dizer nada. Né?'),
+              narr('Ela não espera resposta.'),
+            ],
+          },
+          {
+            effects: [flag('nina_curiosa'), emo('nina', 'estresse', 4)],
+            result: [say('nina', 'Por nada. Já disse. Esquece.'), narr('Ela some atrás do amplificador pelos próximos vinte minutos.')],
+          },
+        ],
+      },
+      {
+        id: 'desconversar',
+        label: '“Pergunta pra ela.”',
+        hint: 'Talvez cedo demais.',
+        outcomes: [
+          {
+            effects: [flag('nina_recuou')],
+            result: [say('nina', 'Não. Não precisa.'), narr('Ela não pergunta. E, pelo jeito, não vai perguntar tão cedo.')],
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 'apagao',
+    title: 'Apagão',
+    cast: ['lia', 'nina'],
+    priority: 6,
+    trigger: all(weekMin(5), hasFlag('nina_curiosa'), relMin('lia', 'nina', 'confianca', 25)),
+    scene: [
+      narr('Uma tempestade derruba a luz do bairro no meio do ensaio. Júlia e Bia vão embora correndo antes que a chuva piore.'),
+      narr('Ficam você, a Lia, a Nina e uma lanterna de celular.'),
+      say('nina', 'Eu odeio isso. Não saber quando volta.'),
+      say('lia', 'Eu gosto. Parece que o mundo deu uma pausa.'),
+      narr('A chuva no basculante.'),
+      say('lia', 'Eu escrevo sobre pessoas com quem não consigo conversar. Acho que é por isso que escrevo tanto.'),
+    ],
+    choices: [
+      {
+        id: 'velas',
+        label: 'Ir procurar velas e deixar as duas conversando',
+        outcomes: [
+          {
+            effects: [rel('lia', 'nina', { confianca: 6, afinidade: 4 }), flag('apagao_juntas')],
+            result: [
+              narr('Você demora mais do que precisa para achar as velas. Quando volta, as duas estão sentadas lado a lado no chão, dividindo um fone.'),
+              say('nina', '…E se a pessoa quiser conversar?'),
+              say('lia', 'Aí eu ia ter que parar de escrever.'),
+              narr('Ninguém ri. Mas ninguém desvia o olhar.'),
+            ],
+          },
+        ],
+      },
+      {
+        id: 'historia',
+        label: 'Contar uma história sua para quebrar o gelo',
+        outcomes: [
+          {
+            effects: [rel('lia', 'nina', { afinidade: 2 }), emo('lia', 'estresse', -5), emo('nina', 'estresse', -5)],
+            result: [narr('Vocês riem até a luz voltar. É uma noite boa — mas a conversa que ia acontecer fica para outro dia.')],
+          },
+        ],
+      },
+      {
+        id: 'casa',
+        label: 'Encerrar o ensaio e levar as duas para casa',
+        outcomes: [
+          {
+            effects: [emo('nina', 'estresse', -8)],
+            result: [narr('Prudente. A Nina agradece. A Lia olha pela janela do carro o caminho inteiro.')],
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 'voce_acha',
+    title: 'Você acha que eu devia?',
+    cast: ['lia'],
+    priority: 7,
+    trigger: all(
+      weekMin(6),
+      hasFlag('nina_curiosa'),
+      any(hasFlag('lia_sente_algo'), hasFlag('lia_nina_momento'), hasFlag('apagao_juntas')),
+      relMin('lia', 'nina', 'afinidade', 40),
+    ),
+    scene: [
+      narr('Lia senta do seu lado na escada do porão. Demora para começar.'),
+      say('lia', 'Posso te perguntar uma coisa? E você promete não fazer cara de nada?'),
+      say('lia', 'Se eu gostasse de alguém da banda. Hipoteticamente.'),
+      say('lia', 'Você acha que eu devia falar? Ou isso estraga tudo?'),
+      narr('Ela não diz o nome. Não precisa.'),
+    ],
+    choices: [
+      {
+        id: 'fale',
+        label: 'Dizer que ela merece falar o que sente',
+        outcomes: [
+          {
+            effects: [flag('lia_vai_falar'), emo('lia', 'confianca', 3), emo('lia', 'estresse', 4), schedule('no_telhado', 1)],
+            result: [say('lia', 'Tá. Tá bom. Antes que eu desista.')],
+          },
+        ],
+      },
+      {
+        id: 'espere',
+        label: 'Sugerir esperar o momento certo',
+        outcomes: [
+          {
+            effects: [flag('lia_vai_falar'), emo('lia', 'estresse', -3), schedule('no_telhado', 3)],
+            result: [say('lia', 'Momento certo. Tá. Eu sou boa em esperar. Sou ótima, na verdade.')],
+          },
+        ],
+      },
+      {
+        id: 'amizade',
+        label: 'Dizer que talvez seja melhor não misturar as coisas',
+        hint: 'A amizade também é um caminho.',
+        outcomes: [
+          {
+            when: hasDraft(),
+            effects: [flag('romance', 'amigas'), emo('lia', 'confianca', -3), emo('lia', 'motivacao', -2), draftBonus({ identity: 3 })],
+            result: [
+              say('lia', '…É. Você tem razão. Provavelmente.'),
+              narr('Ela não fala mais nisso. Mas a música nova ganha uma ponte que dói um pouco.'),
+            ],
+          },
+          {
+            effects: [flag('romance', 'amigas'), emo('lia', 'confianca', -3), emo('lia', 'motivacao', -2)],
+            result: [say('lia', '…É. Você tem razão. Provavelmente.'), narr('Ela guarda o caderno na mochila e não fala mais nisso.')],
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 'no_telhado',
+    title: 'No telhado',
+    cast: ['lia', 'nina'],
+    priority: 9,
+    followUp: true,
+    scene: [
+      narr('Depois do ensaio, Lia pede para a Nina subir com ela no telhado do prédio. As duas demoram quarenta minutos.'),
+      narr('Quando descem, nenhuma diz nada. Lia vai direto pegar a mochila. Nina fica parada no meio da sala, segurando um papel dobrado.'),
+    ],
+    choices: [
+      {
+        id: 'perguntar',
+        label: 'Perguntar à Lia como foi',
+        outcomes: [
+          {
+            when: all(relMin('lia', 'nina', 'afinidade', 45), relMin('lia', 'nina', 'confianca', 35), emotionMax('nina', 'estresse', 80)),
+            effects: [
+              flag('romance', 'juntas'),
+              rel('lia', 'nina', { afinidade: 10, confianca: 8 }),
+              emo('lia', 'confianca', 6),
+              emo('lia', 'motivacao', 6),
+              emo('nina', 'motivacao', 5),
+              modifier('lia', 'compor', 1.15, 3, 'Lia inspirada'),
+              schedule('as_outras_perceberam', 2),
+            ],
+            result: [
+              say('lia', 'Ela disse que conta os meus compassos também.'),
+              narr('Lia ri — um riso que você nunca tinha ouvido. Do outro lado da sala, Nina desdobra o papel, lê de novo e guarda no bolso de dentro da jaqueta.'),
+            ],
+          },
+          {
+            effects: [flag('romance', 'amigas'), emo('lia', 'confianca', -6), emo('lia', 'estresse', 6), emo('lia', 'motivacao', -4), rel('lia', 'nina', { confianca: 4, afinidade: -2 })],
+            result: [
+              say('lia', 'Ela disse que não sente o mesmo. Que gosta muito de mim, mas não assim.'),
+              narr('Uma pausa.'),
+              say('lia', 'Ela foi gentil. Pior ainda.'),
+              narr('No dia seguinte, Nina devolve o papel, dobrado com cuidado. As duas continuam ensaiando lado a lado. Vai levar um tempo.'),
+            ],
+          },
+        ],
+      },
+      {
+        id: 'esperar',
+        label: 'Não perguntar nada e deixar que elas contem quando quiserem',
+        outcomes: [
+          {
+            when: all(relMin('lia', 'nina', 'afinidade', 45), relMin('lia', 'nina', 'confianca', 35), emotionMax('nina', 'estresse', 80)),
+            effects: [
+              flag('romance', 'juntas'),
+              rel('lia', 'nina', { afinidade: 10, confianca: 10 }),
+              emo('lia', 'confianca', 6),
+              emo('nina', 'motivacao', 5),
+              modifier('lia', 'compor', 1.15, 3, 'Lia inspirada'),
+              schedule('as_outras_perceberam', 2),
+            ],
+            result: [
+              narr('Você não pergunta. Não precisa.'),
+              narr('No dia seguinte, as duas chegam juntas. E a Nina — que nunca se atrasou na vida — chega dez minutos atrasada.'),
+            ],
+          },
+          {
+            effects: [flag('romance', 'amigas'), emo('lia', 'confianca', -4), emo('lia', 'estresse', 5), rel('lia', 'nina', { confianca: 5, afinidade: -2 })],
+            result: [
+              narr('Você não pergunta. Durante uma semana, as duas evitam ficar sozinhas na mesma sala.'),
+              narr('Depois, aos poucos, voltam a dividir o fone.'),
+            ],
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 'as_outras_perceberam',
+    title: 'As outras perceberam',
+    cast: ['bia', 'julia'],
+    priority: 9,
+    followUp: true,
+    scene: [
+      say('bia', 'Então. A gente vai fingir que não viu a Lia e a Nina de mãos dadas no ponto de ônibus?'),
+      say('julia', 'Eu tô feliz por elas. De verdade. Só que… e se der errado? A banda inteira vai junto.'),
+      narr('As duas olham para você.'),
+    ],
+    choices: [
+      {
+        id: 'conversa',
+        label: 'Propor uma conversa com a banda toda',
+        outcomes: [
+          {
+            when: relMin('julia', 'lia', 'respeito', 25),
+            effects: [rel('julia', 'lia', { respeito: 4 }), rel('julia', 'nina', { respeito: 4 }), rel('bia', 'lia', { afinidade: 3 }), rel('bia', 'nina', { afinidade: 3 }), flag('banda_sabe')],
+            result: [narr('Na conversa, a Lia fala pouco e a Nina fala tudo, em tópicos. No fim, a Júlia abraça as duas ao mesmo tempo. A Bia chora e diz que é alergia.')],
+          },
+          {
+            effects: [rel('julia', 'lia', { rivalidade: 3 }), emo('julia', 'estresse', 5), flag('banda_sabe')],
+            result: [narr('A conversa fica tensa. A Júlia diz o que pensa; a Lia ouve como crítica. Mas, pelo menos, está tudo dito.')],
+          },
+        ],
+      },
+      {
+        id: 'delas',
+        label: 'Dizer que o assunto é delas, e que elas contam quando quiserem',
+        outcomes: [
+          {
+            effects: [rel('lia', 'nina', { confianca: 5 }), emo('julia', 'estresse', 3)],
+            result: [say('bia', 'Justo. Mas eu vou fazer uma música sobre isso.'), say('julia', 'Você não vai.'), say('bia', 'Vou sim.')],
+          },
+        ],
+      },
+      {
+        id: 'regras',
+        label: 'Pedir que elas separem as coisas nos ensaios',
+        outcomes: [
+          {
+            effects: [emo('lia', 'estresse', 4), emo('nina', 'estresse', -3), rel('lia', 'nina', { afinidade: -2 })],
+            result: [narr('Nina cria um documento chamado “Diretrizes de convivência profissional”. A Lia assina rindo. A Bia pede para assinar também.')],
           },
         ],
       },

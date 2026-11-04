@@ -14,6 +14,8 @@ import { SongsPanel } from './components/SongsPanel';
 import { TopBar } from './components/TopBar';
 import { EntriesModal, WeekReportModal } from './components/WeekReportModal';
 import { StoryModal } from './components/StoryModal';
+import { GoalsPanel } from './components/GoalsPanel';
+import { ShowsPanel } from './components/ShowsPanel';
 import { EVENTS } from '../data/events';
 import { StudioBackdrop } from './art/StudioBackdrop';
 
@@ -22,7 +24,7 @@ const noop = () => {};
 function playWeeks(n: number): { state: GameState; report: WeekReport } {
   const { state, reports } = playCampaign(
     createNewGame(99),
-    { concept: { genre: 'punk', theme: 'liberdade', direction: 'emocional', leader: 'bia' } },
+    { concept: { genre: 'indie', theme: 'saudade', direction: 'emocional', leader: 'lia' } },
     n,
   );
   return { state, report: reports[reports.length - 1] };
@@ -47,6 +49,8 @@ describe('interface', () => {
         <PlanPanel state={state} onAdvance={noop} onOpenEvent={noop} />
         <SongsPanel state={state} onNewSong={noop} onToggleRelease={noop} />
         <RelationsPanel state={state} />
+        <GoalsPanel state={state} />
+        <ShowsPanel state={state} onBook={noop} />
         <WeekReportModal report={report} onClose={noop} />
       </>,
     );
@@ -93,6 +97,10 @@ describe('interface', () => {
   it('renderiza o fim da temporada', () => {
     const { state } = playWeeks(12);
     expect(state.finished).toBe(true);
-    expect(renderToString(<SeasonEnd state={state} onNew={noop} onMenu={noop} />)).toContain('Fim da temporada');
+    expect(state.festival).not.toBeNull();
+    const html = renderToString(<SeasonEnd state={state} onNew={noop} onMenu={noop} />);
+    expect(html).toContain('Avaliação do júri');
+    expect(html).toContain('Epílogo');
+    expect(renderToString(<ShowsPanel state={{ ...state, finished: false, booking: { venue: 'festival' } }} onBook={noop} />)).toContain('seletiva');
   });
 });

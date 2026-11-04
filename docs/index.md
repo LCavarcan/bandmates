@@ -1,6 +1,6 @@
 # Bandmates
 
-**Bandmates** é um simulador de gerenciamento musical com narrativa e relações. Você acompanha quatro integrantes de uma banda iniciante por uma temporada de 12 semanas: compõe, ensaia, grava, lança e lida com o que acontece entre elas.
+**Bandmates** é um simulador de gerenciamento musical com narrativa e relações. Você acompanha quatro integrantes de uma banda iniciante por uma temporada de 12 semanas: compõe, ensaia, grava, lança, faz shows e lida com o que acontece entre elas, até a seletiva do Festival Maré Alta.
 
 O jogo roda localmente e offline. Não precisa de conta e não tem custo nenhum.
 
@@ -11,8 +11,8 @@ O jogo roda localmente e offline. Não precisa de conta e não tem custo nenhum.
 | 1. Estrutura funcional | Estúdio, integrantes, atividades semanais, avanço do tempo, resumo da semana | ✅ Concluída |
 | 2. Ciclo musical | Composição com escolhas, gravação, lançamento, streaming, fãs/dinheiro/reputação | ✅ Concluída |
 | 3. Personagens e relações | Eventos condicionais com escolhas, continuações, conversas, consequências nas ações musicais | ✅ Concluída |
-| 4. Campanha | Shows, objetivos, arco romântico opcional, final | ⏳ Próxima |
-| 5. Persistência e polimento | Refino visual, testes extras, distribuição | — |
+| 4. Campanha | Shows, metas, seletiva do festival, arco romântico opcional, epílogos | ✅ Concluída |
+| 5. Persistência e polimento | Refino visual, testes extras, distribuição | ⏳ Próxima |
 
 Veja o [roadmap](projeto/roadmap.md) e o [changelog](projeto/changelog.md).
 

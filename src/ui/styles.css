@@ -429,6 +429,53 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
 .consequences__who { display: flex; min-width: 30px; }
 .consequences__who .avatar + .avatar { margin-left: -8px; }
 
+/* ---------- Fase 4: shows, metas, festival e final ---------- */
+.activity-show { margin: 0; padding: 0.4rem 0.6rem; border-radius: 10px; font-weight: 700; font-size: 0.85rem; background: color-mix(in srgb, var(--c) 22%, var(--bg-2)); color: var(--c); text-align: center; }
+
+.panel--goals { border-color: color-mix(in srgb, var(--teal) 45%, var(--line)); }
+.goals__countdown { margin: 0; }
+.goals__countdown strong { color: var(--teal); font-size: 1.15rem; }
+.goals { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.85rem; }
+.goal { color: var(--ink-soft); }
+.goal--done { color: var(--good); }
+
+.venues { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.45rem; }
+.venue { background: var(--bg-2); border-radius: 12px; padding: 0.55rem 0.7rem; display: flex; flex-direction: column; gap: 0.25rem; border: 1.5px solid transparent; }
+.venue--booked { border-color: var(--amber); background: color-mix(in srgb, var(--amber) 10%, var(--bg-2)); }
+.venue--locked { opacity: 0.6; }
+.venue__head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+.venue__name { font-weight: 700; }
+.venue__desc { margin: 0; font-size: 0.75rem; color: var(--muted); }
+.venue__foot { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+.show-history { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.78rem; }
+.show-history li { display: flex; justify-content: space-between; gap: 0.5rem; }
+.tier { font-weight: 700; }
+.tier--memoravel { color: var(--lilac); }
+.tier--bom { color: var(--good); }
+.tier--morno { color: var(--mid); }
+.tier--desastre { color: var(--bad); }
+.panel--festival { border-color: var(--teal); background: linear-gradient(160deg, #1f4250, var(--panel)); }
+.panel--festival p { margin: 0; }
+
+.season-end__verdict { font-size: 1.1rem; margin: 0; }
+.season-end--selecionadas h2 { color: var(--amber); }
+.season-end--alternativo h2 { color: var(--teal); }
+.season-end--nao_foi h2 { color: var(--ink-soft); }
+.season-end h3 { font-size: 1.1rem; margin: 0; }
+.jury { background: var(--bg-2); border-radius: 14px; padding: 0.9rem 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.jury ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+.jury li { display: grid; grid-template-columns: 190px 1fr 80px; gap: 0.6rem; align-items: center; font-size: 0.88rem; }
+.jury__bar { height: 8px; border-radius: 99px; background: var(--panel); overflow: hidden; }
+.jury__bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--teal), var(--amber)); }
+.jury__value { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+.epilogue { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.epilogue li { display: flex; gap: 0.8rem; align-items: center; }
+.epilogue strong { color: var(--c); }
+.epilogue__portrait { flex: none; width: 72px; height: 76px; overflow: hidden; border-radius: 12px; background: color-mix(in srgb, var(--c) 60%, #1d1630); display: flex; align-items: flex-end; justify-content: center; }
+.epilogue__romance { margin: 0; padding: 0.7rem 0.9rem; border-radius: 12px; background: color-mix(in srgb, var(--lilac) 14%, transparent); font-style: italic; }
+.season-end__relations summary { cursor: pointer; color: var(--ink-soft); }
+@media (max-width: 640px) { .jury li { grid-template-columns: 1fr 60px; } .jury__bar { display: none; } }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }

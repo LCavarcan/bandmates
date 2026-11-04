@@ -1,4 +1,5 @@
 import { ACTIVITIES, ECONOMY } from '../../data/activities';
+import { VENUES } from '../../data/venues';
 import { MEMBER_ORDER } from '../../data/members';
 import { describeModifier, estimateMoney, planIssues, recordingTarget, rehearsalTarget } from '../../engine';
 import type { ActivityId, GameState, MemberId } from '../../engine/types';
@@ -15,6 +16,7 @@ export function PlanPanel({ state, onAdvance, onOpenEvent }: { state: GameState;
   const release = state.songs.find((s) => s.id === state.pendingRelease);
 
   const detail = (act: ActivityId): string | null => {
+    if (act === 'show' && state.booking) return `${VENUES[state.booking.venue].icon} ${VENUES[state.booking.venue].name}`;
     if (act === 'compor' && state.draft) return `“${state.draft.title}”`;
     const rec = recordingTarget(state);
     if (act === 'gravar' && rec) return `“${rec.title}”`;
@@ -50,7 +52,7 @@ export function PlanPanel({ state, onAdvance, onOpenEvent }: { state: GameState;
       )}
       <p className={`estimate ${est.max < 0 ? 'estimate--neg' : ''}`}>
         Caixa previsto: <strong>{range}</strong>
-        <span className="muted small"> · inclui aluguel de {fmtMoney(ECONOMY.weeklyRent)} e streaming</span>
+        <span className="muted small"> · inclui aluguel de {fmtMoney(ECONOMY.weeklyRent)}, streaming e show</span>
       </p>
       {state.modifiers.length > 0 && (
         <ul className="modifiers">

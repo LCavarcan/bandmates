@@ -28,14 +28,16 @@
 - [x] Conversa da semana (três abordagens, respostas por personagem).
 - [x] Consequências nas ações musicais: modificadores de atividade, bônus na música, entrosamento na gravação.
 
-## ⏳ Fase 4: campanha
+## ✅ Fase 4: campanha
 
-- [ ] Shows locais (renda principal, preparo, setlist).
-- [ ] Objetivo: a seletiva do festival na semana 12.
-- [ ] Arco romântico opcional (sáfico), gradual e recíproco.
-- [ ] Finais com base no que a banda construiu.
+- [x] Shows em 4 casas (requisitos, intervalo, gênero preferido, setlist com covers, nota, público, cachê).
+- [x] Objetivo: a seletiva do Festival Maré Alta na semana 12, com a avaliação do júri.
+- [x] 7 metas intermediárias que somam pontos na avaliação.
+- [x] Eventos de campanha: *O cartaz*, *Depois do primeiro show*, *Véspera*.
+- [x] Arco romântico opcional entre Lia e Nina: sinais dos dois lados, vulnerabilidade, decisão, reciprocidade, amizade como final válido.
+- [x] Final com resultado, epílogo por integrante e epílogo do arco.
 
-## Fase 5: persistência e polimento
+## ⏳ Fase 5: persistência e polimento
 
 - [ ] Refino de interface e retratos.
 - [ ] Mais testes e correções.

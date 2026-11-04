@@ -24,6 +24,7 @@ export const all = (...of: Condition[]): Condition => ({ type: 'all', of });
 export const any = (...of: Condition[]): Condition => ({ type: 'any', of });
 export const not = (of: Condition): Condition => ({ type: 'not', of });
 export const weekMin = (min: number): Condition => ({ type: 'week', min });
+export const weekIs = (week: number): Condition => ({ type: 'week', min: week, max: week });
 export const emotionMin = (member: MemberId, key: EmotionKey, min: number): Condition => ({ type: 'emotion', member, key, min });
 export const emotionMax = (member: MemberId, key: EmotionKey, max: number): Condition => ({ type: 'emotion', member, key, max });
 export const relMin = (a: MemberId, b: MemberId, key: RelationKey, min: number): Condition => ({ type: 'relation', a, b, key, min });

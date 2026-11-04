@@ -2,7 +2,7 @@ import { ECONOMY } from '../data/activities';
 import { MEMBER_ORDER, MEMBERS, START_RELATIONS } from '../data/members';
 import type { ActivityId, GameState, MemberId, MemberState, Plan } from './types';
 
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 export const CAMPAIGN_WEEKS = 12;
 
 export function createNewGame(seed: number = Date.now() % 2147483647): GameState {
@@ -35,11 +35,15 @@ export function createNewGame(seed: number = Date.now() % 2147483647): GameState
     scheduled: [],
     modifiers: [],
     talkedWeek: null,
+    booking: null,
+    shows: [],
+    festival: null,
     finished: false,
   };
 }
 
 export function setActivity(state: GameState, member: MemberId, activity: ActivityId): GameState {
-  if (state.finished) return state;
+  // Com show marcado, o plano é da banda inteira; "show" só entra via setBooking.
+  if (state.finished || state.booking || activity === 'show') return state;
   return { ...state, plan: { ...state.plan, [member]: activity } as Plan };
 }

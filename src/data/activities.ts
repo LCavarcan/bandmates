@@ -53,6 +53,14 @@ export const ACTIVITIES: Record<ActivityId, ActivityDef> = {
     description: 'Cartazes, redes sociais e conversa de bar. Ganha fãs; rende mais com músicas lançadas e amplia um lançamento da mesma semana.',
     cost: 40,
   },
+  show: {
+    id: 'show',
+    name: 'Show',
+    icon: '🎤',
+    short: 'A banda inteira no palco',
+    description: 'Show marcado: a banda inteira sobe ao palco nesta semana.',
+    cost: 0,
+  },
   bico: {
     id: 'bico',
     name: 'Trabalho extra',
@@ -101,6 +109,10 @@ export const FLAVOR: Record<MemberId, Record<ActivityId, string[]>> = {
       'Júlia conversou com metade do bar e saiu com o Instagram de um produtor anotado no guardanapo.',
       'Júlia fez uma live improvisada no terraço. Cantou, riu e pediu para todo mundo compartilhar.',
     ],
+    show: [
+      'Júlia subiu ao palco como se tivesse nascido nele. Antes da primeira música, já sabia o nome de três pessoas da plateia.',
+      'Júlia cantou a última música no meio do público. Ninguém pediu. Todo mundo amou.',
+    ],
     bico: [
       'Júlia cantou num casamento. Pagaram bem, mas ninguém perguntou o nome da banda.',
       'Júlia trabalhou no caixa da loja de discos e passou o turno inteiro olhando para a seção de lançamentos.',
@@ -126,6 +138,10 @@ export const FLAVOR: Record<MemberId, Record<ActivityId, string[]>> = {
     divulgar: [
       'Lia colou cartazes de madrugada, quando ninguém poderia puxar conversa.',
       'Lia respondeu comentários nas redes com mensagens longas e sinceras. Algumas pessoas choraram.',
+    ],
+    show: [
+      'Lia tocou o show inteiro de costas para a plateia, virada para o amplificador. No solo, se virou. Só no solo.',
+      'Lia vomitou de nervoso antes de subir. Depois tocou como se não houvesse ninguém ali.',
     ],
     bico: [
       'Lia deu aulas de violão para uma criança que só queria tocar música de videogame. Ensinou mesmo assim.',
@@ -153,6 +169,10 @@ export const FLAVOR: Record<MemberId, Record<ActivityId, string[]>> = {
       'Bia fez amizade com o dono do bar da esquina. Agora tem um pôster da banda acima da chapa.',
       'Bia gravou um vídeo tocando bateria em baldes na rua. Viralizou um pouquinho.',
     ],
+    show: [
+      'Bia contou “um, dois, três, quatro” tão alto que o bar inteiro respondeu “vai!”.',
+      'Bia quebrou uma baqueta, jogou para o público e pegou outra sem perder o tempo.',
+    ],
     bico: [
       'Bia trabalhou de garçonete num evento e ganhou gorjeta por fazer o bolo dançar.',
       'Bia carregou equipamento para outra banda. Voltou com dinheiro e opiniões sobre o baterista deles.',
@@ -178,6 +198,10 @@ export const FLAVOR: Record<MemberId, Record<ActivityId, string[]>> = {
     divulgar: [
       'Nina montou um calendário de postagens impecável. Escrever as legendas foi a parte difícil.',
       'Nina distribuiu panfletos com uma eficiência assustadora. Não sorriu para ninguém.',
+    ],
+    show: [
+      'Nina não olhou para a plateia nenhuma vez. Também não errou nenhuma vez.',
+      'Nina conferiu a afinação três vezes antes do show e uma vez entre cada música. Ninguém reclamou.',
     ],
     bico: [
       'Nina fez a revisão técnica de uma gravação alheia. Encontrou trinta e dois erros e corrigiu todos.',

@@ -5,6 +5,7 @@ import { DeltaChips } from './DeltaChips';
 import { fmtMoney } from './TopBar';
 
 const SECTIONS: { kind: LogKind; title: string }[] = [
+  { kind: 'show', title: 'No palco' },
   { kind: 'member', title: 'Cada uma na sua' },
   { kind: 'song', title: 'Música' },
   { kind: 'pair', title: 'Entre elas' },

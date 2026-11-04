@@ -15,6 +15,7 @@ import {
   recordingTarget,
   saveGame,
   setActivity,
+  setBooking,
   setRelease,
   startSong,
 } from '../engine';
@@ -26,6 +27,8 @@ import { PlanPanel } from './components/PlanPanel';
 import { RelationsPanel } from './components/RelationsPanel';
 import { SeasonEnd, TitleScreen } from './components/Screens';
 import { SongsPanel } from './components/SongsPanel';
+import { GoalsPanel } from './components/GoalsPanel';
+import { ShowsPanel } from './components/ShowsPanel';
 import { StoryModal, type StoryChoice } from './components/StoryModal';
 import { TopBar } from './components/TopBar';
 import { EntriesModal, WeekReportModal } from './components/WeekReportModal';
@@ -131,6 +134,12 @@ export function App() {
   const unavailable: Partial<Record<ActivityId, string>> = {};
   if (!game.draft) unavailable.compor = 'Defina uma nova música no painel “Músicas” para poder compor.';
   if (!recordingTarget(game)) unavailable.gravar = 'Não há música composta esperando gravação.';
+  const booked = !!game.booking;
+  const caption = game.finished
+    ? 'Temporada encerrada'
+    : game.week === game.maxWeeks
+      ? 'Semana 12 — a seletiva do Maré Alta'
+      : `Semana ${game.week} — o que a banda vai fazer?`;
   const identity = bandIdentity(game);
 
   return (
@@ -142,7 +151,7 @@ export function App() {
             <StudioBackdrop week={game.week} />
             <div className="scene__caption">
               <p className="eyebrow">Estúdio Porão 27 · {identity.label}</p>
-              <h1>{game.finished ? 'Temporada encerrada' : `Semana ${game.week} — o que a banda vai fazer?`}</h1>
+              <h1>{caption}</h1>
             </div>
           </div>
           {game.finished ? (
@@ -154,7 +163,7 @@ export function App() {
                   key={id}
                   member={game.members[id]}
                   activity={game.plan[id]}
-                  disabled={false}
+                  disabled={booked}
                   unavailable={unavailable}
                   onChoose={(a) => choose(id, a)}
                   onTalk={canTalk(game) ? () => setOverlay({ kind: 'talk', member: id }) : undefined}
@@ -165,6 +174,8 @@ export function App() {
         </div>
         <aside className="studio__side">
           {!game.finished && <PlanPanel state={game} onAdvance={advance} onOpenEvent={() => setOverlay(eventOverlay(game))} />}
+          {!game.finished && <GoalsPanel state={game} />}
+          {!game.finished && <ShowsPanel state={game} onBook={(v) => setGame((g) => (g ? setBooking(g, v) : g))} />}
           <SongsPanel
             state={game}
             onNewSong={() => setOverlay({ kind: 'compose' })}
