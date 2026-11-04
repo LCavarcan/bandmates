@@ -1,9 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
-import { MEMBER_ORDER } from '../data/members';
+import { MEMBER_ORDER, MEMBERS } from '../data/members';
+import { TALK_APPROACHES, TALK_OPENING, TALK_ORDER, type TalkApproach } from '../data/talks';
 import {
   advanceWeek,
   bandIdentity,
+  canTalk,
   createNewGame,
+  currentEvent,
+  eventChoices,
+  resolveEvent,
+  talk,
   deleteSave,
   loadGame,
   recordingTarget,
@@ -12,7 +18,7 @@ import {
   setRelease,
   startSong,
 } from '../engine';
-import type { ActivityId, GameState, LogEntry, MemberId, SongConcept, WeekReport } from '../engine/types';
+import type { ActivityId, EventDef, GameState, LogEntry, MemberId, SongConcept, WeekReport } from '../engine/types';
 import { StudioBackdrop } from './art/StudioBackdrop';
 import { ComposeModal } from './components/ComposeModal';
 import { MemberCard } from './components/MemberCard';
@@ -20,6 +26,7 @@ import { PlanPanel } from './components/PlanPanel';
 import { RelationsPanel } from './components/RelationsPanel';
 import { SeasonEnd, TitleScreen } from './components/Screens';
 import { SongsPanel } from './components/SongsPanel';
+import { StoryModal, type StoryChoice } from './components/StoryModal';
 import { TopBar } from './components/TopBar';
 import { EntriesModal, WeekReportModal } from './components/WeekReportModal';
 
@@ -38,7 +45,30 @@ type Overlay =
   | { kind: 'report'; report: WeekReport }
   | { kind: 'compose' }
   | { kind: 'reactions'; title: string; entries: LogEntry[] }
+  /** O evento e as escolhas são capturados ao abrir, para a cena não sumir quando o estado muda. */
+  | { kind: 'event'; event: EventDef; choices: StoryChoice[] }
+  | { kind: 'talk'; member: MemberId }
   | null;
+
+function eventOverlay(g: GameState): Overlay {
+  const event = currentEvent(g);
+  if (!event) return null;
+  const choices: StoryChoice[] = eventChoices(g).map(({ choice, available }) => ({
+    id: choice.id,
+    label: choice.label,
+    hint: choice.hint,
+    disabled: !available,
+    reason: choice.requiresText,
+  }));
+  return { kind: 'event', event, choices };
+}
+
+const TALK_CHOICES: StoryChoice[] = TALK_ORDER.map((a) => ({
+  id: a,
+  label: TALK_APPROACHES[a].label,
+  icon: TALK_APPROACHES[a].icon,
+  hint: TALK_APPROACHES[a].description,
+}));
 
 export function App() {
   const [game, setGame] = useState<GameState | null>(null);
@@ -77,6 +107,23 @@ export function App() {
 
   const closeOverlay = useCallback(() => setOverlay(null), []);
 
+  // Um evento pendente abre sozinho assim que nada mais estiver na tela (ex.: depois do resumo).
+  useEffect(() => {
+    if (game?.pendingEvent && overlay === null) setOverlay(eventOverlay(game));
+  }, [game, overlay]);
+
+  const chooseInEvent = (id: string) => {
+    const r = resolveEvent(game!, id);
+    setGame(r.state);
+    return r;
+  };
+
+  const chooseInTalk = (member: MemberId, approach: TalkApproach) => {
+    const r = talk(game!, member, approach);
+    setGame(r.state);
+    return r;
+  };
+
   if (!game) {
     return <TitleScreen saved={saved} onContinue={() => saved && setGame(saved)} onNew={startNew} />;
   }
@@ -110,13 +157,14 @@ export function App() {
                   disabled={false}
                   unavailable={unavailable}
                   onChoose={(a) => choose(id, a)}
+                  onTalk={canTalk(game) ? () => setOverlay({ kind: 'talk', member: id }) : undefined}
                 />
               ))}
             </div>
           )}
         </div>
         <aside className="studio__side">
-          {!game.finished && <PlanPanel state={game} onAdvance={advance} />}
+          {!game.finished && <PlanPanel state={game} onAdvance={advance} onOpenEvent={() => setOverlay(eventOverlay(game))} />}
           <SongsPanel
             state={game}
             onNewSong={() => setOverlay({ kind: 'compose' })}
@@ -127,6 +175,33 @@ export function App() {
       </main>
       {overlay?.kind === 'report' && <WeekReportModal report={overlay.report} onClose={closeOverlay} />}
       {overlay?.kind === 'compose' && <ComposeModal state={game} onConfirm={confirmSong} onCancel={closeOverlay} />}
+      {overlay?.kind === 'event' && (
+        <StoryModal
+          key={overlay.event.id}
+          state={game}
+          eyebrow={`Acontecimento · semana ${game.pendingEvent?.week ?? game.week - 1}`}
+          title={overlay.event.title}
+          cast={overlay.event.cast}
+          scene={overlay.event.scene}
+          choices={overlay.choices}
+          onChoose={chooseInEvent}
+          onDone={closeOverlay}
+        />
+      )}
+      {overlay?.kind === 'talk' && (
+        <StoryModal
+          key={`talk-${overlay.member}`}
+          state={game}
+          eyebrow="Conversa da semana"
+          title={MEMBERS[overlay.member].name}
+          cast={[overlay.member]}
+          scene={[{ text: TALK_OPENING[overlay.member] }]}
+          choices={TALK_CHOICES}
+          onChoose={(a) => chooseInTalk(overlay.member, a as TalkApproach)}
+          onDone={closeOverlay}
+          onCancel={closeOverlay}
+        />
+      )}
       {overlay?.kind === 'reactions' && (
         <EntriesModal
           eyebrow="Nova música"

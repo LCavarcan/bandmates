@@ -60,6 +60,18 @@ const MIGRATIONS: Record<number, (state: any) => any> = {
     st.version = 2;
     return st;
   },
+  // v2 → v3: eventos narrativos, modificadores, conversas e bônus de música.
+  2: (st) => {
+    st.flags ??= {};
+    st.pendingEvent = null;
+    st.eventLog = [];
+    st.scheduled = [];
+    st.modifiers = [];
+    st.talkedWeek = null;
+    if (st.draft) st.draft.bonus ??= {};
+    st.version = 3;
+    return st;
+  },
 };
 
 function migrate(version: number, state: GameState): GameState | null {

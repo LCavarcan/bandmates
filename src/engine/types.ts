@@ -64,6 +64,16 @@ export interface SongDraft extends SongConcept {
   originalityWeighted: number;
   writers: MemberId[];
   weekStarted: number;
+  /** Ajustes vindos de eventos, somados aos atributos quando a música fica pronta. */
+  bonus: Partial<SongBonus>;
+}
+
+export interface SongBonus {
+  quality: number;
+  originality: number;
+  commercial: number;
+  cohesion: number;
+  identity: number;
 }
 
 export type SongStatus = 'composta' | 'gravada' | 'lancada';
@@ -152,7 +162,104 @@ export interface GameState {
   /** Semente do gerador pseudoaleatório: torna a simulação reproduzível. */
   seed: number;
   history: WeekReport[];
-  /** Escolhas narrativas e marcos (usado pelos próximos sistemas de eventos). */
-  flags: Record<string, number | boolean | string>;
+  /** Escolhas narrativas e marcos. */
+  flags: Record<string, FlagValue>;
+  /** Evento aguardando decisão (bloqueia o avanço da semana). */
+  pendingEvent: { id: string; week: number } | null;
+  /** Eventos já vistos e a escolha feita. */
+  eventLog: { id: string; week: number; choice: string }[];
+  /** Eventos de continuação agendados para uma semana futura. */
+  scheduled: { event: string; week: number }[];
+  /** Modificadores temporários de atividade (vindos de eventos e conversas). */
+  modifiers: Modifier[];
+  /** Semana em que houve a última conversa (uma por semana). */
+  talkedWeek: number | null;
   finished: boolean;
+}
+
+export type FlagValue = boolean | number | string;
+
+export interface Modifier {
+  label: string;
+  /** null = toda a banda. */
+  member: MemberId | null;
+  activity: ActivityId | 'todas';
+  /** Multiplicador do fator de disposição nessa atividade. */
+  mult: number;
+  /** Última semana (inclusive) em que vale. */
+  untilWeek: number;
+}
+
+// ---------------------------------------------------------------------------
+// Narrativa orientada a dados (eventos e conversas)
+
+export interface DialogueLine {
+  /** Sem speaker = narração. */
+  speaker?: MemberId;
+  text: string;
+}
+
+type Range = { min?: number; max?: number };
+
+export type Condition =
+  | ({ type: 'week' } & Range)
+  | ({ type: 'emotion'; member: MemberId; key: EmotionKey } & Range)
+  | ({ type: 'skill'; member: MemberId; key: SkillKey } & Range)
+  | ({ type: 'relation'; a: MemberId; b: MemberId; key: RelationKey } & Range)
+  | ({ type: 'resource'; key: ResourceKey } & Range)
+  | { type: 'flag'; name: string; equals?: FlagValue; exists?: boolean }
+  /** A integrante fez uma destas atividades na semana que acabou. */
+  | { type: 'did'; member: MemberId; activities: ActivityId[] }
+  /** As duas fizeram a mesma atividade (dentre as listadas) na semana que acabou. */
+  | { type: 'together'; a: MemberId; b: MemberId; activities: ActivityId[] }
+  | { type: 'draft'; leader?: MemberId; minProgress?: number }
+  /** Uma música foi lançada na semana que acabou. */
+  | { type: 'released'; reception?: Reception[]; writer?: MemberId; notLeader?: MemberId }
+  | { type: 'songs'; status: SongStatus; min: number }
+  | { type: 'chance'; p: number }
+  | { type: 'all'; of: Condition[] }
+  | { type: 'any'; of: Condition[] }
+  | { type: 'not'; of: Condition };
+
+export type ResourceKey = 'money' | 'fans' | 'reputation';
+
+export type Effect =
+  | { type: 'emotion'; member: MemberId; key: EmotionKey; value: number }
+  | { type: 'skill'; member: MemberId; key: SkillKey; value: number }
+  | { type: 'relation'; a: MemberId; b: MemberId; delta: Partial<Relation> }
+  | { type: 'resource'; key: ResourceKey; value: number }
+  | { type: 'flag'; name: string; value: FlagValue }
+  | { type: 'draft'; bonus: Partial<SongBonus> }
+  | { type: 'modifier'; member: MemberId | null; activity: ActivityId | 'todas'; mult: number; weeks: number; label: string }
+  | { type: 'schedule'; event: string; inWeeks: number };
+
+/** Desfecho de uma escolha: o primeiro cujo `when` for verdadeiro (ou sem `when`) vale. */
+export interface Outcome {
+  when?: Condition;
+  effects: Effect[];
+  result: DialogueLine[];
+}
+
+export interface EventChoice {
+  id: string;
+  label: string;
+  hint?: string;
+  /** Condição para a escolha estar disponível. */
+  requires?: Condition;
+  requiresText?: string;
+  outcomes: Outcome[];
+}
+
+export interface EventDef {
+  id: string;
+  title: string;
+  cast: MemberId[];
+  /** Maior prioridade dispara primeiro quando vários eventos são possíveis. */
+  priority: number;
+  /** Continuações só disparam quando agendadas por outro evento. */
+  followUp?: boolean;
+  /** Condição de ativação (ignorada nas continuações, que usam `when` opcional). */
+  trigger?: Condition;
+  scene: DialogueLine[];
+  choices: EventChoice[];
 }

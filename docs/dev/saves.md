@@ -8,7 +8,7 @@ O save fica em `localStorage`, na chave `bandmates.save`:
 
 ```json
 {
-  "version": 2,
+  "version": 3,
   "savedAt": "2026-11-04T12:00:00.000Z",
   "state": { "...": "GameState completo" }
 }
@@ -22,6 +22,7 @@ O jogo salva automaticamente a cada mudança de estado. O armazenamento é acess
 |---|---|
 | 1 | Fase 1: músicas com qualidade, originalidade e lapidação |
 | 2 | Fase 2: conceito (gênero, tema, direção, líder), apelo, coesão, identidade, gravação, lançamento, `pendingRelease` |
+| 3 | Fase 3: `pendingEvent`, `eventLog`, `scheduled`, `modifiers`, `talkedWeek`, `draft.bonus` |
 
 ## Como adicionar uma migração
 

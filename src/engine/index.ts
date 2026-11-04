@@ -16,5 +16,9 @@ export {
   TITLE_MAX,
 } from './music';
 export { relationKey, getRelation, describeRelation, synergy } from './relations';
+export { currentEvent, eventChoices, pickWeekEvent, resolveEvent, seenEvent } from './events';
+export type { ChoiceView, StoryResult } from './events';
+export { canTalk, talk } from './talk';
+export { activityMultiplier, describeModifier, evaluate } from './narrative';
 export { saveGame, loadGame, deleteSave, serialize, deserialize } from './save';
 export type { KeyValueStore } from './save';

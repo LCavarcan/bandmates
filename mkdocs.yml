@@ -67,6 +67,7 @@ nav:
       - Semana e atividades: mecanicas/semana.md
       - Ciclo musical: mecanicas/musica.md
       - Relações: mecanicas/relacoes.md
+      - Eventos e conversas: mecanicas/eventos.md
       - Economia: mecanicas/economia.md
   - Desenvolvimento:
       - Arquitetura: dev/arquitetura.md

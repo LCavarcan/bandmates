@@ -13,6 +13,8 @@ import { RelationsPanel } from './components/RelationsPanel';
 import { SongsPanel } from './components/SongsPanel';
 import { TopBar } from './components/TopBar';
 import { EntriesModal, WeekReportModal } from './components/WeekReportModal';
+import { StoryModal } from './components/StoryModal';
+import { EVENTS } from '../data/events';
 import { StudioBackdrop } from './art/StudioBackdrop';
 
 const noop = () => {};
@@ -42,7 +44,7 @@ describe('interface', () => {
         {MEMBER_ORDER.map((id) => (
           <MemberCard key={id} member={state.members[id]} activity={state.plan[id]} disabled={false} onChoose={noop} />
         ))}
-        <PlanPanel state={state} onAdvance={noop} />
+        <PlanPanel state={state} onAdvance={noop} onOpenEvent={noop} />
         <SongsPanel state={state} onNewSong={noop} onToggleRelease={noop} />
         <RelationsPanel state={state} />
         <WeekReportModal report={report} onClose={noop} />
@@ -67,6 +69,25 @@ describe('interface', () => {
     const { state } = playWeeks(12);
     const html = renderToString(<SongsPanel state={state} onNewSong={noop} onToggleRelease={noop} />);
     expect(html).toContain('Lançada');
+  });
+
+  it('renderiza cada evento como cena', () => {
+    const s = createNewGame(5);
+    for (const e of EVENTS) {
+      const html = renderToString(
+        <StoryModal
+          state={s}
+          eyebrow="Acontecimento"
+          title={e.title}
+          cast={e.cast}
+          scene={e.scene}
+          choices={e.choices.map((c) => ({ id: c.id, label: c.label, hint: c.hint }))}
+          onChoose={() => ({ result: [], entries: [] })}
+          onDone={noop}
+        />,
+      );
+      expect(html).toContain(e.choices[0].label.replace(/"/g, '&quot;'));
+    }
   });
 
   it('renderiza o fim da temporada', () => {

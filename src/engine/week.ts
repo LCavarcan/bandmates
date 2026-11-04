@@ -4,6 +4,8 @@ import { RELATION_LABELS } from '../data/labels';
 import { MEMBER_ORDER, MEMBERS } from '../data/members';
 import { PAIR_LINES } from '../data/pairs';
 import { MemberChanges, trait } from './changes';
+import { pickWeekEvent } from './events';
+import { activityMultiplier } from './narrative';
 import {
   composeContribution,
   finalizeRecording,
@@ -86,7 +88,9 @@ export function advanceWeek(prev: GameState): WeekResult {
   for (const id of MEMBER_ORDER) {
     ctx.changes[id] = new MemberChanges(s.members[id]);
     const burnt = s.members[id].emotions.estresse >= BURNOUT_STRESS;
-    ctx.mf[id] = moodFactor(s.members[id]) * (burnt && s.plan[id] !== 'descansar' ? 0.5 : 1);
+    // Modificadores de eventos/conversas multiplicam o rendimento na atividade escolhida.
+    ctx.mf[id] =
+      moodFactor(s.members[id]) * (burnt && s.plan[id] !== 'descansar' ? 0.5 : 1) * activityMultiplier(s, id, s.plan[id]);
   }
 
   // 1. Atividades individuais
@@ -175,8 +179,12 @@ export function advanceWeek(prev: GameState): WeekResult {
     reputation: ctx.reputation,
   };
 
+  // Evento narrativo da semana (não há eventos depois da última semana).
+  if (s.week < s.maxWeeks) pickWeekEvent(s, s.week, rng);
+
   s.week += 1;
   if (s.week > s.maxWeeks) s.finished = true;
+  s.modifiers = s.modifiers.filter((m) => m.untilWeek >= s.week);
   s.seed = rng.seed();
   s.history = [...s.history, report].slice(-s.maxWeeks);
   return { state: s, report };
@@ -239,7 +247,7 @@ const RESOLVERS: Record<ActivityId, Resolver> = {
     ctx.money -= ACTIVITIES.gravar.cost;
 
     song.recording ??= { progress: 0, performanceWeighted: 0, players: [] };
-    const r = recordContribution(m, ctx.mf[id]);
+    const r = recordContribution(s, m, ctx.mf[id], ctx.byActivity.gravar);
     song.recording.progress += r.progress;
     song.recording.performanceWeighted += r.performance * r.progress;
     if (!song.recording.players.includes(id)) song.recording.players.push(id);

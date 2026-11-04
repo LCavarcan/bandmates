@@ -3,7 +3,7 @@
 Simulador de gerenciamento de banda com narrativa e relações. Feito com TypeScript, React e Vite.
 Roda localmente e offline. Não precisa de conta e não tem nenhum custo.
 
-**Versão 0.2.0:** Fases 1 (estrutura) e 2 (ciclo musical) concluídas.
+**Versão 0.3.0:** Fases 1 (estrutura), 2 (ciclo musical) e 3 (personagens, eventos e conversas) concluídas.
 
 ## Jogar no Windows
 

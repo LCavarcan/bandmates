@@ -46,6 +46,8 @@ Integrantes que fazem **a mesma atividade** passam a semana juntas. As regras s�
 - **Velocidade de composição:** `colab = 1 + sinergia/100` (limitado a ±30%).
 - **Originalidade:** uma rivalidade com respeito ≥ 20 soma `rivalidade × 0.15`. Pessoas que discordam podem fazer música excelente.
 - **Coesão:** depende da sinergia média entre as autoras.
+- **Gravação:** o entrosamento entre quem grava junto altera o desempenho em até ±15%.
+- **Eventos:** muitas condições de ativação e muitos desfechos dependem das dimensões da relação. Por exemplo, *Duas da manhã* termina bem ou mal conforme a afinidade entre Bia e Nina.
 
 ## Rótulos
 
@@ -63,5 +65,5 @@ Integrantes que fazem **a mesma atividade** passam a semana juntas. As regras s�
 | Ainda se conhecendo | confiança ≤ 5 e afinidade ≤ 10 |
 | Colegas de banda | caso contrário |
 
-!!! note "Próximas fases"
-    Na Fase 3, eventos narrativos com escolhas vão usar estas dimensões como condições de ativação. Na Fase 4, entra o arco romântico opcional, que depende de escolhas e reciprocidade, não só de números.
+!!! note "Próxima fase"
+    Na Fase 4, entra o arco romântico opcional, que depende de escolhas, flags plantadas pelos eventos e reciprocidade, não só de números.

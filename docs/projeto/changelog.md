@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.3.0 — Fase 3: personagens e relações
+
+### Novo
+
+- **Eventos narrativos** com cena em estilo visual novel (retratos, falas, escolhas):
+    - 9 eventos principais e 4 continuações;
+    - condições de ativação baseadas em semana, emoções, relações, recursos, atividades, músicas e escolhas anteriores;
+    - escolhas trancadas com motivo, desfechos que dependem do estado e consequências que voltam semanas depois.
+- **Conversa da semana:** perguntar, elogiar ou cobrar; cada integrante responde do seu jeito.
+- **Modificadores temporários** de atividade, exibidos no plano da semana.
+- **Bônus na música em composição** vindos de escolhas narrativas.
+- **Entrosamento na gravação:** a química entre quem grava muda o desempenho.
+- Página de documentação sobre eventos e conversas, com um guia para escrever eventos novos.
+
+### Alterado
+
+- O save passou para a **versão 3**, com migração automática da v1 e da v2.
+- O bot de testes resolve eventos.
+
 ## 0.2.0 — Fase 2: ciclo musical
 
 ### Novo

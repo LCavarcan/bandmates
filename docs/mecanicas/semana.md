@@ -6,13 +6,14 @@ Código: `src/engine/week.ts`. Dados e falas: `src/data/activities.ts`.
 
 Ao clicar em **Avançar semana**, a simulação segue esta ordem:
 
-1. **Validação do plano.** Compor sem música definida ou gravar sem música composta bloqueia o avanço (`planIssues`).
+1. **Validação do plano.** Compor sem música definida, gravar sem música composta ou ter um evento pendente bloqueia o avanço (`planIssues`).
 2. **Atividades individuais**, na ordem Júlia, Lia, Bia, Nina.
 3. **Música:** composição concluída → gravação concluída → streaming das músicas já lançadas → lançamento marcado.
 4. **Duplas:** cada par na mesma atividade interage (veja [Relações](relacoes.md)).
 5. **Custos fixos:** aluguel. Se o caixa ficar negativo, todas perdem motivação.
 6. **Alertas** de estresse e motivação.
-7. A semana avança. Ao passar da semana 12, a temporada termina.
+7. **Evento da semana:** no máximo um, exceto na última semana (veja [Eventos e conversas](eventos.md)).
+8. A semana avança. Os modificadores vencidos são removidos. Ao passar da semana 12, a temporada termina.
 
 A simulação usa um gerador pseudoaleatório com semente salva no estado. Com a mesma semente e o mesmo plano, o resultado é sempre o mesmo.
 
@@ -23,6 +24,12 @@ mf = (0.6 + motivação/250) × (1 − estresse/250)        // 0.36 .. 1.0
 ```
 
 O fator é calculado **no início** da semana. Se o estresse estiver em **85 ou mais** (esgotada), `mf` cai pela metade em qualquer atividade, menos em Descansar.
+
+Depois, o fator é multiplicado pelos **modificadores** ativos para aquela integrante e atividade, vindos de eventos e conversas:
+
+```
+mf_final = mf × (0.5 se esgotada) × Π modificadores ativos
+```
 
 **Retorno decrescente:** `escala(h) = max(0.25, 1 − h/120)`. Quanto maior a habilidade, menor o ganho.
 
@@ -79,6 +86,10 @@ Custa **R$ 40**.
 - Ganha `R$ 110 + rng(0..30)`. Impulsivas têm 20% de chance de chegar atrasadas (−R$ 40).
 - Estresse +10, ou +7 para disciplinadas.
 - Motivação −5, ou −9 para ambiciosas.
+
+## 💬 Conversar
+
+Fora das atividades: uma conversa por semana, com uma integrante, sem gastar a atividade dela. Veja [Eventos e conversas](eventos.md#conversas).
 
 ## Alertas
 

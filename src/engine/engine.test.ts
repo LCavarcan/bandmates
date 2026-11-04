@@ -16,11 +16,15 @@ import {
   type GameState,
   type KeyValueStore,
 } from './index';
+import { autoResolve } from './bot';
 
 const SEED = 12345;
 
 const withSong = (s: GameState) =>
   startSong(s, { title: 'Teste', genre: 'indie', theme: 'cidade', direction: 'emocional', leader: 'lia' }).state;
+
+/** Avança uma semana resolvendo antes qualquer evento pendente. */
+const step = (s: GameState) => advanceWeek(autoResolve(s)).state;
 
 function planAll(s: GameState, act: ActivityId): GameState {
   return MEMBER_ORDER.reduce((acc, id) => setActivity(acc, id, act), s);
@@ -73,7 +77,7 @@ describe('avanço de semana', () => {
 
   it('encerra a campanha após a última semana', () => {
     let s = planAll(createNewGame(SEED), 'descansar');
-    for (let i = 0; i < s.maxWeeks; i++) s = advanceWeek(s).state;
+    for (let i = 0; i < s.maxWeeks; i++) s = step(s);
     expect(s.finished).toBe(true);
     const again = advanceWeek(s);
     expect(again.state).toBe(s);
@@ -95,8 +99,8 @@ describe('atividades', () => {
     let solo = setActivity(planAll(createNewGame(SEED), 'descansar'), 'julia', 'ensaiar');
     let group = planAll(createNewGame(SEED), 'ensaiar');
     for (let i = 0; i < 4; i++) {
-      solo = advanceWeek(solo).state;
-      group = advanceWeek(group).state;
+      solo = step(solo);
+      group = step(group);
     }
     expect(group.members.julia.skills.ritmo).toBeGreaterThan(solo.members.julia.skills.ritmo);
   });
@@ -119,7 +123,7 @@ describe('atividades', () => {
     expect(first.draft!.progress).toBeGreaterThan(0);
 
     s = first;
-    for (let i = 0; i < 8 && s.songs.length === 0; i++) s = advanceWeek(s).state;
+    for (let i = 0; i < 8 && s.songs.length === 0; i++) s = step(s);
     expect(s.songs).toHaveLength(1);
     expect(s.songs[0].writers).toContain('lia');
     expect(s.songs[0].quality).toBeGreaterThan(0);

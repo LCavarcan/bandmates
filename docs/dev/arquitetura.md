@@ -10,6 +10,9 @@ src/
     week.ts            advanceWeek: resolução da semana
     music.ts           conceito, composição, gravação, lançamento, streaming
     relations.ts       sinergia, interações em dupla, rótulos
+    narrative.ts       avaliador de condições e aplicador de efeitos (dados → estado)
+    events.ts          seleção e resolução de eventos
+    talk.ts            conversa da semana
     changes.ts         MemberChanges: aplica e registra deltas
     save.ts            serialização, versão e migrações
     rng.ts             gerador pseudoaleatório com semente (mulberry32)
@@ -20,6 +23,9 @@ src/
     activities.ts      atividades, economia, falas, títulos
     music.ts           gêneros, temas, direções, recepção, reações
     pairs.ts           falas de dupla
+    events.ts          eventos narrativos (cenas, escolhas, desfechos)
+    talks.ts           conversas por personagem e abordagem
+    dsl.ts             atalhos para escrever eventos como dados
     labels.ts          rótulos de interface
   ui/
     App.tsx            orquestra o estado e os modais
@@ -40,6 +46,8 @@ A interface chama funções que **recebem o estado e devolvem um novo estado**, 
 | `startSong(state, concept)` | `{ state, entries }` (reações) |
 | `setActivity`, `setRelease` | novo estado |
 | `planIssues(state)` | lista de problemas que bloqueiam o avanço |
+| `resolveEvent(state, choiceId)` | `{ state, result, entries }` |
+| `talk(state, member, approach)` | `{ state, result, entries }` |
 
 Internamente, `advanceWeek` faz um `structuredClone` e trabalha na cópia.
 
@@ -49,7 +57,7 @@ A semente do RNG faz parte do estado. Com a mesma semente e as mesmas decisões,
 
 ### Dados separados da lógica
 
-Personagens, falas, gêneros, temas e constantes ficam em `src/data/`. Adicionar uma fala, um título ou um tema não exige mexer no motor.
+Personagens, falas, gêneros, temas, eventos, conversas e constantes ficam em `src/data/`. Os eventos são **dados puros**: condições e efeitos são objetos, não funções, e o motor os interpreta em `narrative.ts`. Adicionar uma fala, um título ou um tema não exige mexer no motor.
 
 ### A interface só apresenta
 
@@ -61,6 +69,8 @@ Os componentes leem o estado e chamam o motor. Nenhuma regra de jogo vive na int
 MemberCard (escolhe atividade) ──► setActivity ──► estado
 SongsPanel  (Nova música)      ──► ComposeModal ──► startSong ──► EntriesModal (reações)
 SongsPanel  (Lançar)           ──► setRelease
+MemberCard  (Conversar)         ──► StoryModal ──► talk
 PlanPanel   (Avançar)          ──► advanceWeek ──► WeekReportModal
+                                                  └► pendingEvent? ──► StoryModal ──► resolveEvent
                                                   └► salvamento automático (useEffect)
 ```

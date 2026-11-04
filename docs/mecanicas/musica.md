@@ -90,6 +90,8 @@ continuidade  = 12 na primeira música; depois,
                 + 10 × (fração com a mesma direção)
 ```
 
+**Bônus de eventos:** escolhas em eventos (por exemplo, *O refrão*) podem somar ajustes à música em composição. Eles entram em cada atributo no momento em que ela fica pronta.
+
 Todos os atributos são limitados a 0–100. Os temas pessoais e as afinidades com gêneros de cada personagem estão em [Personagens](../design/personagens.md).
 
 !!! example "Caminhos diferentes"
@@ -107,9 +109,12 @@ O ensaio lapida a **próxima música a ser gravada**, ou seja, a mais antiga com
 Exige uma música *Composta*. Cada integrante escalada para **Gravar** custa R$ 50 e contribui:
 
 ```
-progresso  = (18 + técnica × 0.2 + ritmo × 0.1) × mf
-desempenho = (técnica × 0.45 + ritmo × 0.35 + presença × 0.2) × (0.7 + 0.3 × mf)
+entrosamento = 1 + clamp(sinergia média com quem grava junto, −30, 30) / 200   // ±15%
+progresso    = (18 + técnica × 0.2 + ritmo × 0.1) × mf
+desempenho   = (técnica × 0.45 + ritmo × 0.35 + presença × 0.2) × (0.7 + 0.3 × mf) × entrosamento
 ```
+
+Gravar com quem você não se dá bem soa pior.
 
 Ao chegar a 100 de progresso:
 

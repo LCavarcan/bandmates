@@ -1,11 +1,11 @@
 import { ACTIVITIES, ECONOMY } from '../../data/activities';
 import { MEMBER_ORDER } from '../../data/members';
-import { estimateMoney, planIssues, recordingTarget, rehearsalTarget } from '../../engine';
+import { describeModifier, estimateMoney, planIssues, recordingTarget, rehearsalTarget } from '../../engine';
 import type { ActivityId, GameState, MemberId } from '../../engine/types';
 import { Avatar } from './Avatar';
 import { fmtMoney } from './TopBar';
 
-export function PlanPanel({ state, onAdvance }: { state: GameState; onAdvance: () => void }) {
+export function PlanPanel({ state, onAdvance, onOpenEvent }: { state: GameState; onAdvance: () => void; onOpenEvent: () => void }) {
   const est = estimateMoney(state);
   const issues = planIssues(state);
   const groups = new Map<ActivityId, MemberId[]>();
@@ -52,6 +52,20 @@ export function PlanPanel({ state, onAdvance }: { state: GameState; onAdvance: (
         Caixa previsto: <strong>{range}</strong>
         <span className="muted small"> · inclui aluguel de {fmtMoney(ECONOMY.weeklyRent)} e streaming</span>
       </p>
+      {state.modifiers.length > 0 && (
+        <ul className="modifiers">
+          {state.modifiers.map((m, i) => (
+            <li key={i} className={m.mult >= 1 ? 'modifier--up' : 'modifier--down'}>
+              {m.mult >= 1 ? '🔥' : '🧊'} {describeModifier(m)}
+            </li>
+          ))}
+        </ul>
+      )}
+      {state.pendingEvent && (
+        <button className="ghost-btn event-btn" onClick={onOpenEvent}>
+          ✨ Ver o acontecimento pendente
+        </button>
+      )}
       {issues.length > 0 && (
         <ul className="issues">
           {issues.map((i) => (

@@ -1,5 +1,6 @@
 // Jogadora automática para testes e balanceamento. Não é usada pela interface.
 import { MEMBER_ORDER } from '../data/members';
+import { eventChoices, resolveEvent } from './events';
 import { planIssues, recordingTarget, setRelease, startSong } from './music';
 import { setActivity } from './state';
 import type { ActivityId, GameState, MemberId, SongConcept, WeekReport } from './types';
@@ -14,9 +15,17 @@ export interface BotOptions {
   promoters?: number;
 }
 
+/** Resolve o evento pendente (se houver) com a primeira escolha disponível. */
+export function autoResolve(s: GameState): GameState {
+  if (!s.pendingEvent) return s;
+  const first = eventChoices(s).find((c) => c.available);
+  if (!first) throw new Error(`evento ${s.pendingEvent.id} sem escolha disponível`);
+  return resolveEvent(s, first.choice.id).state;
+}
+
 /** Decide o plano de uma semana com regras simples e legíveis. */
 export function botPlan(s: GameState, opt: BotOptions): GameState {
-  let st = s;
+  let st = autoResolve(s);
   if (!st.draft && !recordingTarget(st) && !st.songs.some((x) => x.status === 'gravada')) {
     st = startSong(st, { ...opt.concept, title: `Faixa ${st.songs.length + 1}` }).state;
   }

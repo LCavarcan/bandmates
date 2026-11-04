@@ -14,9 +14,11 @@ interface Props {
   /** Atividades indisponíveis nesta semana, com o motivo. */
   unavailable?: Partial<Record<ActivityId, string>>;
   onChoose: (a: ActivityId) => void;
+  /** Ausente = conversa indisponível nesta semana. */
+  onTalk?: () => void;
 }
 
-export function MemberCard({ member, activity, disabled, unavailable = {}, onChoose }: Props) {
+export function MemberCard({ member, activity, disabled, unavailable = {}, onChoose, onTalk }: Props) {
   const p = MEMBERS[member.id];
   const mood = moodOf(member);
   const [showProfile, setShowProfile] = useState(false);
@@ -68,9 +70,19 @@ export function MemberCard({ member, activity, disabled, unavailable = {}, onCho
         </div>
       )}
 
-      <button className="link-btn" onClick={() => setShowProfile((v) => !v)}>
-        {showProfile ? '← Ver atributos' : 'Conhecer ' + p.name + ' →'}
-      </button>
+      <div className="member__actions">
+        <button className="link-btn" onClick={() => setShowProfile((v) => !v)}>
+          {showProfile ? '← Ver atributos' : 'Conhecer ' + p.name + ' →'}
+        </button>
+        <button
+          className="talk-btn"
+          onClick={onTalk}
+          disabled={!onTalk}
+          title={onTalk ? `Conversar com ${p.name} (uma conversa por semana)` : 'Você já conversou com alguém nesta semana.'}
+        >
+          💬 Conversar
+        </button>
+      </div>
 
       <div className="activities" role="radiogroup" aria-label={`Atividade de ${p.name}`}>
         {ACTIVITY_ORDER.map((id) => {

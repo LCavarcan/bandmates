@@ -20,15 +20,15 @@
 - [x] Lançamento, recepção e streaming com decaimento.
 - [x] Identidade artística da banda.
 
-## ⏳ Fase 3: personagens e relações
+## ✅ Fase 3: personagens e relações
 
-- [ ] Sistema de eventos orientado a dados (condições, escolhas, consequências).
-- [ ] De 8 a 12 eventos escritos à mão.
-- [ ] Flags de escolhas anteriores com consequências futuras.
-- [ ] Ação "Conversar" (interagir com uma integrante).
-- [ ] Consequências das relações nas ações musicais (além da composição).
+- [x] Sistema de eventos orientado a dados (condições, escolhas, desfechos condicionais).
+- [x] 9 eventos principais e 4 continuações, escritos à mão.
+- [x] Flags e continuações agendadas com consequências futuras.
+- [x] Conversa da semana (três abordagens, respostas por personagem).
+- [x] Consequências nas ações musicais: modificadores de atividade, bônus na música, entrosamento na gravação.
 
-## Fase 4: campanha
+## ⏳ Fase 4: campanha
 
 - [ ] Shows locais (renda principal, preparo, setlist).
 - [ ] Objetivo: a seletiva do festival na semana 12.

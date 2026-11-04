@@ -2,7 +2,7 @@ import { ECONOMY } from '../data/activities';
 import { MEMBER_ORDER, MEMBERS, START_RELATIONS } from '../data/members';
 import type { ActivityId, GameState, MemberId, MemberState, Plan } from './types';
 
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 export const CAMPAIGN_WEEKS = 12;
 
 export function createNewGame(seed: number = Date.now() % 2147483647): GameState {
@@ -30,6 +30,11 @@ export function createNewGame(seed: number = Date.now() % 2147483647): GameState
     seed: seed >>> 0,
     history: [],
     flags: {},
+    pendingEvent: null,
+    eventLog: [],
+    scheduled: [],
+    modifiers: [],
+    talkedWeek: null,
     finished: false,
   };
 }

@@ -14,6 +14,7 @@ import {
   type ActivityId,
   type GameState,
   type SongConcept,
+  SAVE_VERSION,
 } from './index';
 import { finalizeSong, releaseOutcome } from './music';
 import type { Song, SongDraft } from './types';
@@ -32,6 +33,7 @@ function draftWith(over: Partial<SongDraft>): SongDraft {
     originalityWeighted: 60 * 100,
     writers: ['lia'],
     weekStarted: 1,
+    bonus: {},
     ...over,
   };
 }
@@ -194,7 +196,7 @@ describe('campanha completa (bot)', () => {
 });
 
 describe('migração de save', () => {
-  it('converte um save v1 para v2', () => {
+  it('converte um save v1 para a versão atual', () => {
     const v1 = {
       version: 1,
       savedAt: '2026-11-04T00:00:00Z',
@@ -209,7 +211,8 @@ describe('migração de save', () => {
     };
     const s = deserialize(JSON.stringify(v1))!;
     expect(s).not.toBeNull();
-    expect(s.version).toBe(2);
+    expect(s.version).toBe(SAVE_VERSION);
+    expect(s.eventLog).toEqual([]);
     expect(s.songs[0].status).toBe('composta');
     expect(s.songs[0].leader).toBe('lia');
     expect(s.plan.lia).toBe('ensaiar');

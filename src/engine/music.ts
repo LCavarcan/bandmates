@@ -51,6 +51,7 @@ export function startSong(prev: GameState, concept: SongConcept): { state: GameS
     originalityWeighted: 0,
     writers: [],
     weekStarted: s.week,
+    bonus: {},
   };
   const rng = createRng(s.seed);
   const entries = reactToConcept(s, s.draft, rng);
@@ -188,10 +189,11 @@ export function finalizeSong(s: GameState, d: SongDraft): Song {
   const dir = DIRECTIONS[d.direction];
   const leader = s.members[d.leader];
 
-  let quality = d.qualityWeighted / d.progress;
+  const bonus = d.bonus ?? {};
+  let quality = d.qualityWeighted / d.progress + (bonus.quality ?? 0);
   if (d.direction === 'emocional') quality += trait(d.leader, 'sensibilidade') * 0.08;
 
-  const originality = d.originalityWeighted / d.progress + genre.originality + dir.originality;
+  const originality = d.originalityWeighted / d.progress + genre.originality + dir.originality + (bonus.originality ?? 0);
 
   const commercial =
     15 +
@@ -200,7 +202,8 @@ export function finalizeSong(s: GameState, d: SongDraft): Song {
     dir.commercial +
     quality * 0.25 +
     leader.skills.presenca * 0.1 +
-    trait(d.leader, 'sociabilidade') * 0.05;
+    trait(d.leader, 'sociabilidade') * 0.05 +
+    (bonus.commercial ?? 0);
 
   const writers = d.writers.length ? d.writers : [d.leader];
   let pairSyn = 0;
@@ -216,7 +219,8 @@ export function finalizeSong(s: GameState, d: SongDraft): Song {
     (pairs ? (pairSyn / pairs) * 0.4 : 5) +
     (avgAff - 55) * 0.4 +
     dir.cohesion +
-    (genre.themes.includes(d.theme) ? 8 : 0);
+    (genre.themes.includes(d.theme) ? 8 : 0) +
+    (bonus.cohesion ?? 0);
 
   const prev = s.songs;
   const continuity = prev.length
@@ -224,7 +228,12 @@ export function finalizeSong(s: GameState, d: SongDraft): Song {
       (prev.filter((x) => x.direction === d.direction).length / prev.length) * 10
     : 12;
   const identity =
-    35 + themeResonance(d.leader, d.theme) * 0.25 + genreAffinity(d.leader, d.genre) * 0.15 + dir.identity + continuity;
+    35 +
+    themeResonance(d.leader, d.theme) * 0.25 +
+    genreAffinity(d.leader, d.genre) * 0.15 +
+    dir.identity +
+    continuity +
+    (bonus.identity ?? 0);
 
   return {
     id: `song-${s.songs.length + 1}`,
@@ -262,10 +271,23 @@ export function rehearsalTarget(s: GameState): Song | undefined {
   return recordingTarget(s) ?? [...s.songs].reverse().find((x) => x.polish < 100);
 }
 
-export function recordContribution(m: MemberState, mf: number): { progress: number; performance: number } {
+/**
+ * Contribuição de uma integrante na gravação. A química com quem grava junto
+ * altera o desempenho: `entrosamento = 1 + clamp(sinergia média, −30, 30) / 200` (±15%).
+ */
+export function recordContribution(
+  s: GameState,
+  m: MemberState,
+  mf: number,
+  players: MemberId[],
+): { progress: number; performance: number } {
+  const partners = players.filter((o) => o !== m.id);
+  const rapport = partners.length
+    ? 1 + clamp(partners.reduce((a, o) => a + synergy(getRelation(s.relations, m.id, o)), 0) / partners.length, -30, 30) / 200
+    : 1;
   return {
     progress: (18 + m.skills.tecnica * 0.2 + m.skills.ritmo * 0.1) * mf,
-    performance: (m.skills.tecnica * 0.45 + m.skills.ritmo * 0.35 + m.skills.presenca * 0.2) * (0.7 + 0.3 * mf),
+    performance: (m.skills.tecnica * 0.45 + m.skills.ritmo * 0.35 + m.skills.presenca * 0.2) * (0.7 + 0.3 * mf) * rapport,
   };
 }
 
@@ -332,6 +354,7 @@ export function setRelease(s: GameState, songId: string | null): GameState {
 /** Problemas que impedem avançar a semana. Lista vazia = plano válido. */
 export function planIssues(s: GameState): string[] {
   const issues: string[] = [];
+  if (s.pendingEvent) issues.push('Há um acontecimento esperando sua decisão.');
   const acts = MEMBER_ORDER.map((id) => s.plan[id]);
   if (acts.includes('compor') && !s.draft) issues.push('Defina a nova música antes de escalar alguém para compor.');
   if (acts.includes('gravar') && !recordingTarget(s)) issues.push('Não há música composta esperando gravação.');
