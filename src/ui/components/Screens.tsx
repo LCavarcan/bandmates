@@ -159,6 +159,13 @@ export function SeasonEnd({ state, onNew, onMenu }: { state: GameState; onNew: (
         ))}
       </ul>
       {ep.romance && <p className="epilogue__romance">💜 {ep.romance}</p>}
+      {ep.unfinished.length > 0 && (
+        <ul className="epilogue__unfinished">
+          {ep.unfinished.map((t) => (
+            <li key={t}>{t}</li>
+          ))}
+        </ul>
+      )}
 
       <details className="season-end__relations">
         <summary>Como ficaram as relações</summary>

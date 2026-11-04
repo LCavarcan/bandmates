@@ -110,6 +110,7 @@ export const EVENTS: EventDef[] = [
     cast: ['nina', 'bia'],
     priority: 9,
     followUp: true,
+    epilogue: 'Bia e Nina nunca chegaram a brigar de verdade por causa dos atrasos. A Nina tem certeza de que essa conversa ainda vai acontecer. A Bia tem certeza de que não.',
     scene: [
       narr('Você chega ao estúdio e encontra só a Bia, sozinha, girando uma baqueta.'),
       say('bia', 'A Nina foi embora. Deixou isso.'),
@@ -336,6 +337,7 @@ export const EVENTS: EventDef[] = [
     cast: ['lia'],
     priority: 9,
     followUp: true,
+    epilogue: 'Lia chegou a separar uma página do caderno para mostrar só para você. A temporada acabou antes. A página continua marcada com um clipe.',
     scene: [
       narr('Lia espera todo mundo sair e se aproxima com o caderno fechado contra o peito.'),
       say('lia', 'Semana passada você podia ter lido. E não leu.'),
@@ -390,6 +392,7 @@ export const EVENTS: EventDef[] = [
     cast: ['lia'],
     priority: 9,
     followUp: true,
+    epilogue: 'Lia nunca perguntou quem mexeu no caderno. Mas agora ela leva o caderno na mochila, e a mochila não sai do colo dela.',
     scene: [
       say('lia', 'Alguém mexeu no meu caderno.'),
       narr('Ela não pergunta. Afirma. Está segurando o caderno aberto na página da lista.'),
@@ -818,6 +821,7 @@ export const EVENTS: EventDef[] = [
     cast: ['lia'],
     priority: 9,
     followUp: true,
+    epilogue: 'A resenha que você escondeu continua lá, a duas buscas de distância. A Lia ainda não achou. Ainda.',
     scene: [
       narr('Lia está com o celular na mão, a tela virada para você. É a resenha.'),
       say('lia', 'Você sabia disso? Faz duas semanas.'),
@@ -1250,6 +1254,7 @@ export const EVENTS: EventDef[] = [
     cast: ['lia', 'nina'],
     priority: 9,
     followUp: true,
+    epilogue: 'Lia passou semanas esperando o momento certo para conversar com a Nina. Ele não veio antes da seletiva. Talvez venha no ônibus da volta.',
     scene: [
       narr('Depois do ensaio, Lia pede para a Nina subir com ela no telhado do prédio. As duas demoram quarenta minutos.'),
       narr('Quando descem, nenhuma diz nada. Lia vai direto pegar a mochila. Nina fica parada no meio da sala, segurando um papel dobrado.'),
@@ -1323,6 +1328,7 @@ export const EVENTS: EventDef[] = [
     cast: ['bia', 'julia'],
     priority: 9,
     followUp: true,
+    epilogue: 'Bia e Júlia viram a Lia e a Nina de mãos dadas no ponto de ônibus e combinaram de fingir que não viram. A Júlia está indo bem. A Bia, não.',
     scene: [
       say('bia', 'Então. A gente vai fingir que não viu a Lia e a Nina de mãos dadas no ponto de ônibus?'),
       say('julia', 'Eu tô feliz por elas. De verdade. Só que… e se der errado? A banda inteira vai junto.'),

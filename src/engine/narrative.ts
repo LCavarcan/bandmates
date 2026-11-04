@@ -187,7 +187,7 @@ export function applyEffects(s: GameState, effects: Effect[]): LogEntry[] {
         break;
       }
       case 'schedule':
-        s.scheduled.push({ event: e.event, week: s.week + e.inWeeks - 1 });
+        s.scheduled.push({ event: e.event, week: scheduleWeek(s, e.inWeeks) });
         break;
     }
   }
@@ -205,6 +205,23 @@ export function applyEffects(s: GameState, effects: Effect[]): LogEntry[] {
   }
   if (band.length) entries.push({ kind: 'band', members: [], text: 'Banda', deltas: band });
   return [...entries, ...extra];
+}
+
+/**
+ * Última semana em que uma continuação pode acontecer: a penúltima semana é da *Véspera*
+ * (prioridade 10) e a última não tem evento.
+ */
+export function lastStoryWeek(s: GameState): number {
+  return s.maxWeeks - 2;
+}
+
+/**
+ * Semana de uma continuação agendada para daqui a `inWeeks` semanas, antecipada para
+ * `lastStoryWeek` quando cairia depois dela. Se nem assim couber, ela vira linha de epílogo.
+ */
+export function scheduleWeek(s: GameState, inWeeks: number): number {
+  const target = s.week + inWeeks - 1;
+  return Math.max(s.week, Math.min(target, lastStoryWeek(s)));
 }
 
 export function describeModifier(m: Modifier): string {

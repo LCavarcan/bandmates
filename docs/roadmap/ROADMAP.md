@@ -176,7 +176,9 @@ Objetivo: transformar suposições em dados e eliminar perdas de conteúdo. **Ne
 - **Critérios de conclusão:** 3 diários preenchidos; lista de bugs priorizada no backlog; [qualidade](../projeto/qualidade.md) atualizada (itens 👀 viram ✅ ou viram bugs).
 - **Área:** testes · **Arquivos:** `docs/projeto/qualidade.md`.
 
-#### F0-02 · Não perder continuações no fim da temporada
+#### F0-02 · Não perder continuações no fim da temporada ✅
+> **Concluída em 04/11/2026** com (a) + (c): agendamentos depois da semana 10 são antecipados para a 10 (`scheduleWeek` em `src/engine/narrative.ts`); o que ainda assim não acontece vira linha de epílogo (`EventDef.epilogue`, `unfinishedStories` em `src/engine/shows.ts`). Testes em `src/engine/events.test.ts` ("continuações no fim da temporada").
+
 - **Descrição:** Garantir que continuações agendadas sejam vistas ou conscientemente descartadas. Opções (escolher uma): (a) não agendar além da semana 10 (antecipar para a última vaga possível); (b) permitir que a *Véspera* ceda lugar a uma continuação pendente e entre como fala dentro da cena; (c) ao terminar a temporada, converter continuações pendentes em linhas de epílogo.
 - **Motivação:** Hoje o caminho "Espere" do romance perde *As outras perceberam* (ver 1.5).
 - **Estado atual:** precisa de refinamento · **Prioridade:** P0 · **Impacto:** médio · **Complexidade:** baixa · **Tamanho:** XS · ✅

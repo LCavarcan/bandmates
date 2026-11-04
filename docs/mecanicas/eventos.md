@@ -7,6 +7,7 @@ Os eventos são **cenas escritas à mão**, disparadas por condições do jogo. 
 ## Como um evento acontece
 
 1. No fim de cada semana (exceto a última), o motor procura **um** evento. Os candidatos são as **continuações agendadas** que venceram (prioridade 9) e os eventos comuns **ainda não vistos** cuja condição de ativação é verdadeira. Vence a **maior prioridade**; em caso de empate, um sorteio com a semente do jogo. Uma continuação que perde volta na semana seguinte. *O cartaz* e a *Véspera* têm prioridade 10.
+   - **Fim da temporada:** a semana 11 é da *Véspera* e a 12 não tem evento, então uma continuação que cairia depois da semana 10 é **antecipada para a semana 10**. Se mesmo assim ela não acontecer (foi agendada na própria semana 10 ou perdeu a disputa), ela **vira uma linha do epílogo**, escrita no campo `epilogue` da continuação. Nenhuma continuação agendada some sem ser vista.
 2. O evento fica **pendente** e aparece logo depois do resumo da semana.
 3. Enquanto houver um evento pendente, não é possível avançar a semana nem conversar.
 4. Cada evento acontece **no máximo uma vez** por campanha.
@@ -123,7 +124,7 @@ A mesma abordagem rende coisas diferentes para cada personagem. Por exemplo, cob
     },
     ```
 
-2. Rode `npm test`. Os testes de dados verificam ids únicos, o desfecho padrão, agendamentos válidos e se todos os efeitos aplicam sem erro.
+2. Rode `npm test`. Os testes de dados verificam ids únicos, o desfecho padrão, agendamentos válidos, se toda continuação tem `epilogue` e se todos os efeitos aplicam sem erro.
 3. Atualize a tabela desta página.
 
 !!! tip "Boas práticas"

@@ -1,9 +1,11 @@
 // Shows, metas e a seletiva do festival. Fórmulas em docs/mecanicas/shows.md.
 import { EPILOGUES, FESTIVAL_TIERS, FESTIVAL_WEIGHTS, GOAL_POINTS, GOALS, ROMANCE_EPILOGUE } from '../data/campaign';
+import { EVENTS_BY_ID } from '../data/events';
 import { MEMBER_ORDER } from '../data/members';
 import { COVER_VALUE, SETLIST_SIZE, SHOW_TIERS, VENUES } from '../data/venues';
 import type { MemberChanges } from './changes';
 import { trait } from './changes';
+import { seenEvent } from './events';
 import { bandUnity, evaluate } from './narrative';
 import type { Rng } from './rng';
 import type {
@@ -178,6 +180,8 @@ export function festivalResult(s: GameState, performance: number): FestivalResul
 export interface Epilogue {
   members: { id: MemberId; text: string }[];
   romance: string | null;
+  /** Continuações agendadas que a temporada não deixou acontecer, contadas como epílogo. */
+  unfinished: string[];
 }
 
 export function epilogue(s: GameState): Epilogue {
@@ -186,6 +190,13 @@ export function epilogue(s: GameState): Epilogue {
   return {
     members: MEMBER_ORDER.map((id) => ({ id, text: pick(EPILOGUES[id]).text })),
     romance: pick(ROMANCE_EPILOGUE).text,
+    unfinished: unfinishedStories(s),
   };
+}
+
+/** Linhas de epílogo das continuações que ficaram agendadas e não foram vistas. */
+export function unfinishedStories(s: GameState): string[] {
+  const ids = [...new Set(s.scheduled.map((x) => x.event))].filter((id) => !seenEvent(s, id));
+  return ids.map((id) => EVENTS_BY_ID[id]?.epilogue).filter((t): t is string => !!t);
 }
 

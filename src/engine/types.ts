@@ -293,6 +293,11 @@ export interface EventDef {
   priority: number;
   /** Continuações só disparam quando agendadas por outro evento. */
   followUp?: boolean;
+  /**
+   * Continuações: linha de epílogo usada se a temporada acabar antes de a cena acontecer
+   * (ver `epilogue` em shows.ts). Obrigatória em toda continuação.
+   */
+  epilogue?: string;
   /** Condição de ativação (ignorada nas continuações, que usam `when` opcional). */
   trigger?: Condition;
   scene: DialogueLine[];

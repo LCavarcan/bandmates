@@ -10,6 +10,7 @@ import {
   createNewGame,
   currentEvent,
   deserialize,
+  epilogue,
   eventChoices,
   getRelation,
   planIssues,
@@ -52,6 +53,15 @@ describe('dados dos eventos', () => {
         if (c.requires) expect(c.requiresText, `${e.id}/${c.id}`).toBeTruthy();
       }
     }
+  });
+
+  it('toda continuação tem uma linha de epílogo para o caso de não acontecer', () => {
+    for (const e of EVENTS) if (e.followUp) expect(e.epilogue, e.id).toBeTruthy();
+  });
+
+  it('a Véspera ocupa a penúltima semana, logo depois da última vaga de continuações', () => {
+    const s = createNewGame(SEED);
+    expect(evaluate(EVENTS_BY_ID.vespera.trigger!, s, s.maxWeeks - 1)).toBe(true);
   });
 
   it('todo agendamento aponta para uma continuação existente', () => {
@@ -259,5 +269,50 @@ describe('campanha com eventos', () => {
     expect(s.eventLog).toEqual([]);
     expect(s.modifiers).toEqual([]);
     expect(() => advanceWeek(s)).not.toThrow();
+  });
+});
+
+describe('continuações no fim da temporada', () => {
+  /** Joga sem fazer nada até o início da semana `week`, resolvendo eventos com a primeira escolha. */
+  function idleUntil(week: number): GameState {
+    let s = createNewGame(SEED);
+    while (s.week < week) {
+      s = autoResolve(s);
+      if (!s.booking) s = planAll(s, 'descansar');
+      s = advanceWeek(s).state;
+    }
+    return autoResolve(s);
+  }
+
+  it('agendamentos que cairiam depois da semana 10 são antecipados', () => {
+    const s9 = resolveEvent(pending('voce_acha', idleUntil(9), 8), 'espere').state;
+    expect(s9.scheduled.find((x) => x.event === 'no_telhado')!.week).toBe(10);
+    const s7 = resolveEvent(pending('voce_acha', idleUntil(7), 6), 'espere').state;
+    expect(s7.scheduled.find((x) => x.event === 'no_telhado')!.week).toBe(9);
+  });
+
+  it('continuações das semanas 10, 11 e 12 são exibidas ou viram epílogo', () => {
+    let s = idleUntil(10);
+    const ids = ['de_novo', 'voce_sabia', 'as_outras_perceberam'];
+    s = { ...s, eventLog: s.eventLog.filter((e) => !ids.includes(e.id)) };
+    s.scheduled = ids.map((event, i) => ({ event, week: 10 + i }));
+    while (!s.finished) {
+      s = autoResolve(s);
+      if (!s.booking) s = planAll(s, 'descansar');
+      s = advanceWeek(s).state;
+    }
+    const seen = new Set(s.eventLog.map((e) => e.id));
+    expect(seen.has('vespera')).toBe(true);
+    expect(seen.has('de_novo')).toBe(true);
+    const unfinished = epilogue(s).unfinished;
+    for (const id of ids) expect(seen.has(id) || unfinished.includes(EVENTS_BY_ID[id].epilogue!), id).toBe(true);
+    expect(unfinished).toHaveLength(2);
+  });
+
+  it('continuações já vistas não aparecem no epílogo', () => {
+    const s = createNewGame(SEED);
+    s.scheduled = [{ event: 'de_novo', week: 12 }];
+    s.eventLog = [{ id: 'de_novo', week: 5, choice: 'juntar' }];
+    expect(epilogue(s).unfinished).toEqual([]);
   });
 });
