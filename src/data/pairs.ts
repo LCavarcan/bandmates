@@ -1,0 +1,87 @@
+import type { ActivityId } from '../engine/types';
+
+/**
+ * Textos de interação em dupla. {a} e {b} viram nomes.
+ * O "tom" é decidido pelas regras do motor (engine/relations.ts) a partir de traços e relação.
+ */
+export type PairTone = 'harmonia' | 'atrito' | 'faisca' | 'neutro';
+
+export const PAIR_LINES: Record<ActivityId, Record<PairTone, string[]>> = {
+  ensaiar: {
+    harmonia: [
+      '{a} e {b} encontraram um encaixe no meio do ensaio e trocaram um sorriso de quem sabe.',
+      '{a} e {b} ficaram depois do horário só para tocar mais uma vez.',
+    ],
+    atrito: [
+      '{a} corrigiu o tempo de {b} pela quinta vez. {b} parou de responder.',
+      'O ensaio entre {a} e {b} terminou com um “tá, tanto faz” que ninguém achou que era “tanto faz”.',
+    ],
+    faisca: [
+      '{a} e {b} disputaram quem segurava a última nota. Ficou incrível — e ninguém admitiu.',
+      '{a} acelerou; {b} acompanhou e acelerou mais. O resto da banda só assistiu.',
+    ],
+    neutro: [
+      '{a} e {b} ensaiaram juntas sem grandes acontecimentos. Às vezes isso é bom.',
+    ],
+  },
+  compor: {
+    harmonia: [
+      '{a} terminou uma frase que {b} tinha começado. As duas ficaram em silêncio um segundo a mais.',
+      '{a} e {b} escreveram juntas até perderem a noção da hora. A música agradece.',
+    ],
+    atrito: [
+      '{a} achou a ideia de {b} “meio óbvia”. {b} achou o comentário de {a} “meio cruel”.',
+      '{a} e {b} discutiram por quarenta minutos sobre uma única palavra do refrão.',
+    ],
+    faisca: [
+      '{a} e {b} discordaram em tudo — e, de algum jeito, a música saiu melhor por isso.',
+      '{a} desafiou {b} a escrever algo mais ousado. {b} aceitou o desafio.',
+    ],
+    neutro: [
+      '{a} e {b} dividiram o trabalho: uma na letra, outra na harmonia.',
+    ],
+  },
+  descansar: {
+    harmonia: [
+      '{a} e {b} saíram para comer pastel e ficaram conversando até a feira fechar.',
+      '{a} e {b} assistiram a um filme ruim e riram dele a noite toda.',
+    ],
+    atrito: [
+      '{a} e {b} tentaram descansar juntas, mas cada uma queria um programa diferente.',
+    ],
+    faisca: [
+      '{a} e {b} transformaram uma partida de sinuca numa competição seríssima.',
+    ],
+    neutro: [
+      '{a} e {b} cruzaram uma com a outra na padaria e conversaram um pouco.',
+    ],
+  },
+  divulgar: {
+    harmonia: [
+      '{a} e {b} formaram uma dupla de divulgação surpreendentemente eficiente.',
+    ],
+    atrito: [
+      '{a} achou que {b} estava falando demais com os fãs. {b} achou que {a} estava falando de menos.',
+    ],
+    faisca: [
+      '{a} e {b} apostaram quem conseguia mais seguidores no fim de semana.',
+    ],
+    neutro: [
+      '{a} e {b} dividiram os bairros e cada uma cuidou do seu.',
+    ],
+  },
+  bico: {
+    harmonia: [
+      '{a} e {b} pegaram o mesmo turno extra e transformaram o cansaço em piada interna.',
+    ],
+    atrito: [
+      '{a} e {b} trabalharam juntas e descobriram que têm ideias muito diferentes sobre “pausa para o café”.',
+    ],
+    faisca: [
+      '{a} e {b} competiram para ver quem ganhava mais gorjeta.',
+    ],
+    neutro: [
+      '{a} e {b} pegaram o mesmo ônibus de volta do trabalho, em silêncio cansado.',
+    ],
+  },
+};
