@@ -7,6 +7,8 @@ Roda localmente e offline. Não precisa de conta e não tem nenhum custo.
 
 ## Jogar
 
+**Online (PC ou celular):** <https://lcavarcan.github.io/bandmates/>
+
 **Arquivo único (mais fácil):** `npm run build:arquivo` gera `dist-arquivo/Bandmates.html`, que abre com dois cliques e funciona offline.
 
 **No celular:** `npm run dev:rede` e abra no celular o endereço "Network" mostrado (mesmo Wi‑Fi).

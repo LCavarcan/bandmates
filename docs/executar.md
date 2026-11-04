@@ -1,5 +1,14 @@
 # Como executar
 
+## Jogar online (também no celular)
+
+**<https://lcavarcan.github.io/bandmates/>**
+
+A cada push na `main`, o workflow `.github/workflows/pages.yml` roda os testes, faz o build e publica no GitHub Pages, que é gratuito para repositórios públicos. Se algum teste falhar, nada é publicado. O jogo continua sem servidor próprio, contas ou telemetria: o Pages só entrega os arquivos, e o save fica no navegador de quem joga.
+
+!!! tip "No celular"
+    Abra o link e use "Adicionar à tela inicial" no menu do navegador para ter um atalho com cara de app.
+
 ## Jeito mais fácil: um arquivo só
 
 ```powershell

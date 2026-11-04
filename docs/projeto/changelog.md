@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.1 — Publicação
+
+- Jogo publicado no GitHub Pages: <https://lcavarcan.github.io/bandmates/>.
+- O workflow de publicação roda os testes antes de cada deploy.
+
 ## 0.5.0 — Fase 5: persistência e polimento
 
 ### Novo

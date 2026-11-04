@@ -76,4 +76,6 @@ Registro curto das decisões de design e de técnica que não estavam especifica
 | Validação estrutural de saves | Arquivos importados podem vir editados ou corrompidos; o melhor é recusar do que quebrar |
 | `ErrorBoundary` com download do save bruto | Se algo quebrar, a jogadora não perde a campanha e pode mandar o arquivo para investigação |
 | Testes de interface falham com `console.error` e `console.warn` | Aproxima o critério "sem erros no console" sem precisar de navegador |
+| Publicação no GitHub Pages via Actions, com testes antes do deploy | Gratuito para repositório público, sem servidor próprio; um teste quebrado nunca vai ao ar |
+| Commits com o e-mail noreply do GitHub antes de tornar o repositório público | O e-mail pessoal não fica exposto no histórico |
 | Nenhuma alteração nos retratos | Mudanças visuais sem poder ver o resultado arriscam regressões; a arte definitiva deve substituir os SVGs |
