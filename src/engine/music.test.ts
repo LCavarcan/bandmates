@@ -6,6 +6,7 @@ import {
   createNewGame,
   deserialize,
   getRelation,
+  knownFit,
   planIssues,
   setActivity,
   setRelease,
@@ -119,6 +120,40 @@ describe('composição', () => {
     const own = finalizeSong(s, draftWith({ leader: 'lia', genre: 'indie', theme: 'saudade' }));
     const alien = finalizeSong(s, draftWith({ leader: 'lia', genre: 'pop', theme: 'rebeldia' }));
     expect(own.identity).toBeGreaterThan(alien.identity);
+  });
+});
+
+describe('compatibilidade tema × gênero', () => {
+  /** Compõe uma música até o fim numa semana e devolve o estado e o texto do relatório. */
+  function compose(base: GameState, concept: SongConcept): { state: GameState; text: string } {
+    const started = startSong({ ...base, pendingEvent: null }, concept).state;
+    started.draft!.progress = 100;
+    const { state, report } = advanceWeek(planAll(started, 'compor'));
+    const entry = report.entries.find((e) => e.kind === 'song' && e.text.startsWith('Música composta'));
+    return { state, text: entry!.text };
+  }
+
+  it('fica oculta até a banda compor uma música com a combinação', () => {
+    const s = createNewGame(SEED);
+    expect(knownFit(s, 'indie', 'amor')).toBeNull();
+    expect(knownFit(s, 'indie', 'rebeldia')).toBeNull();
+
+    const fit = compose(s, LIA_INDIE);
+    expect(knownFit(fit.state, 'indie', 'amor')).toBe(true);
+    expect(knownFit(fit.state, 'indie', 'rebeldia')).toBeNull();
+    expect(knownFit(fit.state, 'pop', 'amor')).toBeNull();
+
+    const miss = compose(s, { ...LIA_INDIE, theme: 'rebeldia' });
+    expect(knownFit(miss.state, 'indie', 'rebeldia')).toBe(false);
+  });
+
+  it('o relatório revela o resultado e marca a primeira descoberta', () => {
+    const first = compose(createNewGame(SEED), LIA_INDIE);
+    expect(first.text).toMatch(/Descoberta: .*combina/);
+    const again = compose(first.state, { ...LIA_INDIE, title: 'De novo' });
+    expect(again.text).toMatch(/combina/);
+    expect(again.text).not.toMatch(/Descoberta/);
+    expect(compose(createNewGame(SEED), { ...LIA_INDIE, theme: 'rebeldia' }).text).toMatch(/não combina/);
   });
 });
 

@@ -366,6 +366,7 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
 .chip-option:hover { border-color: color-mix(in srgb, var(--lilac) 55%, transparent); }
 .chip-option--on { border-color: var(--lilac); background: color-mix(in srgb, var(--lilac) 20%, var(--bg-2)); }
 .match { color: var(--amber); }
+.match--no { color: var(--muted); }
 .leader {
   --c: var(--amber);
   display: flex; flex-direction: column; align-items: center; gap: 0.15rem; padding: 0.6rem 0.4rem;

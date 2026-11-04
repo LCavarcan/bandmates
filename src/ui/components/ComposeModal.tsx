@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { SONG_TITLES } from '../../data/activities';
 import { MEMBER_ORDER, MEMBERS } from '../../data/members';
 import { DIRECTION_ORDER, DIRECTIONS, GENRE_ORDER, GENRES, THEME_ORDER, THEMES } from '../../data/music';
-import { genreAffinity, themeResonance, TITLE_MAX } from '../../engine';
+import { genreAffinity, knownFit, themeResonance, TITLE_MAX } from '../../engine';
 import type { DirectionId, GameState, GenreId, MemberId, SongConcept, ThemeId } from '../../engine/types';
 import { moodOf, Portrait } from '../art/Portrait';
 import { Avatar } from './Avatar';
@@ -23,6 +23,16 @@ function Fans({ love, dislike }: { love: MemberId[]; dislike?: MemberId[] }) {
         </span>
       ))}
     </span>
+  );
+}
+
+/** Resultado já descoberto da combinação tema × gênero; nada enquanto não foi testada. */
+function FitMark({ fit, genre }: { fit: boolean | null; genre: string }) {
+  if (fit === null) return null;
+  return fit ? (
+    <span className="match" title={`Testado: combina com ${genre}`}>✦</span>
+  ) : (
+    <span className="match match--no" title={`Testado: não combina com ${genre}`}>✕</span>
   );
 }
 
@@ -117,12 +127,15 @@ export function ComposeModal({ state, onConfirm, onCancel }: Props) {
               {THEME_ORDER.map((t) => (
                 <button type="button" key={t} className={`chip-option ${theme === t ? 'chip-option--on' : ''}`} onClick={() => setTheme(t)} aria-pressed={theme === t}>
                   {THEMES[t].name}
-                  {GENRES[genre].themes.includes(t) && <span className="match" title={`Combina com ${GENRES[genre].name}`}>✦</span>}
+                  <FitMark fit={knownFit(state, genre, t)} genre={GENRES[genre].name} />
                   <Fans love={MEMBER_ORDER.filter((id) => themeResonance(id, t) >= 80)} />
                 </button>
               ))}
             </div>
-            <p className="muted small">✦ combina com o gênero escolhido (mais coesão). ♥ tema pessoal para alguém (mais identidade, se ela liderar).</p>
+            <p className="muted small">
+              Alguns temas combinam com o gênero (mais coesão) — só dá para saber compondo. ✦ já testado e combina · ✕ já testado e
+              não combina. ♥ tema pessoal para alguém (mais identidade, se ela liderar).
+            </p>
           </fieldset>
 
           <fieldset>

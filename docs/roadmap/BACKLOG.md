@@ -14,6 +14,13 @@
 | B-G04 | Variações do trabalho extra (aula, café, freela) com pequenos efeitos em habilidades | P3 | S | ⚠️ Dá cor, mas aumenta texto e números; preferir só falas novas (B-N01) |
 | B-G05 | Predefinições de plano ("semana de composição", "semana de show") | P3 | XS | Reduz cliques; reavaliar após playtest |
 
+### Retorno do playtest (04/11/2026, celular, 1 campanha)
+
+| ID | Item | Prior. | Tam. | Notas |
+|---|---|---|---|---|
+| B-G06 | **Campanha curta demais.** Depois da seletiva, continuar: preparação para as fases do festival, um concurso, outros festivais, até a banda ser reconhecida mundialmente — ou não | P1 | XL | ⚠️ Conflita com ROADMAP §6 ("campanha contínua… depois do 1.0"). Precisa de decisão da autora e, se aprovada, virar fase própria no roadmap |
+| B-M06 ✅ | **Compatibilidade tema × gênero revelada só depois.** Esconder o ✦ na composição; mostrar a compatibilidade no fim da música e lembrar as combinações já descobertas | P1 | S | Hoje o ✦ aparece antes (`src/ui/components/ComposeModal.tsx`). Transforma a escolha em experimentação; conversa com F4-03. **Feito em 04/11/2026** (ver [música](../mecanicas/musica.md#generos)) |
+
 ## Narrativa
 
 | ID | Item | Prior. | Tam. | Notas |

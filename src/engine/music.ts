@@ -25,6 +25,17 @@ export const TITLE_MAX = 40;
 export const themeResonance = (id: MemberId, theme: ThemeId) => MEMBERS[id].themes[theme] ?? 40;
 export const genreAffinity = (id: MemberId, genre: GenreId) => MEMBERS[id].genres[genre];
 
+/** O tema combina com o gênero (+8 de coesão). Regra oculta: a interface só mostra depois de testada. */
+export const themeFits = (genre: GenreId, theme: ThemeId) => GENRES[genre].themes.includes(theme);
+
+/**
+ * O que a banda já sabe sobre a combinação: `true`/`false` se alguma música composta
+ * já usou esse gênero com esse tema, `null` se ainda não foi testada.
+ */
+export function knownFit(s: GameState, genre: GenreId, theme: ThemeId): boolean | null {
+  return s.songs.some((x) => x.genre === genre && x.theme === theme) ? themeFits(genre, theme) : null;
+}
+
 const fill = (tpl: string, vars: Record<string, string>) =>
   tpl.replace(/\{(\w)\}/g, (_, k: string) => vars[k] ?? '');
 
@@ -219,7 +230,7 @@ export function finalizeSong(s: GameState, d: SongDraft): Song {
     (pairs ? (pairSyn / pairs) * 0.4 : 5) +
     (avgAff - 55) * 0.4 +
     dir.cohesion +
-    (genre.themes.includes(d.theme) ? 8 : 0) +
+    (themeFits(d.genre, d.theme) ? 8 : 0) +
     (bonus.cohesion ?? 0);
 
   const prev = s.songs;

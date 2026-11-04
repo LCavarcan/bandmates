@@ -5,6 +5,8 @@ export {
   bandIdentity,
   canStartSong,
   genreAffinity,
+  knownFit,
+  themeFits,
   planIssues,
   recordingTarget,
   rehearsalTarget,

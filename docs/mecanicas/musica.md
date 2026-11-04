@@ -31,6 +31,8 @@ Só existe **uma música em composição por vez**.
 | Alternativo | Técnica | −6 | +10 | Recomeço, Cidade, Saudade |
 | Punk rock | Ritmo | −3 | +3 | Rebeldia, Liberdade, Amizade |
 
+**Combinação descoberta compondo.** No jogo, a coluna "Temas que combinam" fica **oculta**: a jogadora só descobre se um tema combina com um gênero quando termina de compor uma música com os dois. O relatório da semana revela o resultado ("✦ Descoberta: Amor × Indie rock combina" ou "… não combina"). A partir daí, a tela de composição marca aquele tema, com aquele gênero, com ✦ (combina) ou ✕ (não combina). O conhecimento vem das músicas já compostas da campanha (`knownFit` em `src/engine/music.ts`), então não há campo novo no save. Ele vale só para a campanha atual.
+
 ### Direções
 
 | Direção | Apelo | Originalidade | Coesão | Identidade | Extra |

@@ -2,6 +2,7 @@
 import { ACTIVITIES, ECONOMY, FLAVOR } from '../data/activities';
 import { RELATION_LABELS } from '../data/labels';
 import { MEMBER_ORDER, MEMBERS } from '../data/members';
+import { GENRES, THEMES } from '../data/music';
 import { PAIR_LINES } from '../data/pairs';
 import { MemberChanges, trait } from './changes';
 import { pickWeekEvent } from './events';
@@ -11,6 +12,7 @@ import {
   composeContribution,
   finalizeRecording,
   finalizeSong,
+  knownFit,
   planIssues,
   recordContribution,
   recordingTarget,
@@ -18,6 +20,7 @@ import {
   releaseOutcome,
   releaseText,
   streamingFor,
+  themeFits,
 } from './music';
 import { applyRelationDelta, getRelation, pairInteraction } from './relations';
 import { createRng, type Rng } from './rng';
@@ -350,16 +353,21 @@ function finishSongIfReady(ctx: WeekContext): LogEntry | null {
   const s = ctx.s;
   const d = s.draft;
   if (!d || d.progress < 100) return null;
+  const firstTry = knownFit(s, d.genre, d.theme) === null;
   const song = finalizeSong(s, d);
   s.songs.push(song);
   s.draft = null;
 
   for (const w of song.writers) ctx.changes[w].emotion('confianca', 5);
   const names = song.writers.map((w) => MEMBERS[w].name).join(' e ');
+  const combo = `${THEMES[song.theme].name} × ${GENRES[song.genre].name}`;
+  const fit = themeFits(song.genre, song.theme)
+    ? `${firstTry ? '✦ Descoberta: ' : '✦ '}${combo} combina — mais coesão.`
+    : `${firstTry ? 'Descoberta: ' : ''}${combo} não combina.`;
   return {
     kind: 'song',
     members: song.writers.slice(0, 2),
-    text: `Música composta: “${song.title}”, assinada por ${names}. Agora ela precisa ser gravada.`,
+    text: `Música composta: “${song.title}”, assinada por ${names}. ${fit} Agora ela precisa ser gravada.`,
     deltas: [
       { label: 'Qualidade', value: song.quality },
       { label: 'Originalidade', value: song.originality },
