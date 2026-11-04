@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { downloadSave, readSaveFile } from '../saveFile';
 import { FESTIVAL_TIERS } from '../../data/campaign';
 import { MEMBER_ORDER, MEMBERS } from '../../data/members';
 import { describeRelation, epilogue } from '../../engine';
@@ -10,12 +11,23 @@ export function TitleScreen({
   saved,
   onContinue,
   onNew,
+  onImport,
 }: {
   saved: GameState | null;
   onContinue: () => void;
   onNew: () => void;
+  onImport: (state: GameState) => void;
 }) {
   const [confirming, setConfirming] = useState(false);
+  const [importMsg, setImportMsg] = useState<string | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+
+  const importFile = async (file: File | undefined) => {
+    if (!file) return;
+    const state = await readSaveFile(file);
+    if (state) onImport(state);
+    else setImportMsg('Esse arquivo não é um save válido do Bandmates (ou é de uma versão incompatível).');
+  };
   return (
     <main className="title-screen">
       <div className="title-screen__band">
@@ -57,7 +69,28 @@ export function TitleScreen({
           </button>
         )}
       </div>
-      <p className="muted small">Progresso salvo automaticamente neste computador. Funciona offline.</p>
+      <div className="title-screen__files">
+        {saved && (
+          <button className="link-btn" onClick={() => downloadSave(saved)}>
+            ⬇️ Exportar save (backup)
+          </button>
+        )}
+        <button className="link-btn" onClick={() => fileInput.current?.click()}>
+          ⬆️ Importar save
+        </button>
+        <input
+          ref={fileInput}
+          type="file"
+          accept="application/json,.json"
+          hidden
+          onChange={(e) => {
+            void importFile(e.target.files?.[0]);
+            e.target.value = '';
+          }}
+        />
+      </div>
+      {importMsg && <p className="import-error">{importMsg}</p>}
+      <p className="muted small">Progresso salvo automaticamente neste navegador. Funciona offline. Use o backup para levar o save a outro aparelho.</p>
     </main>
   );
 }

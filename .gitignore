@@ -5,3 +5,4 @@ dist
 .venv
 site
 *.tsbuildinfo
+dist-arquivo

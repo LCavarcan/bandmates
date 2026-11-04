@@ -78,6 +78,7 @@ nav:
       - Documentação: dev/documentacao.md
   - Projeto:
       - Roadmap: projeto/roadmap.md
+      - Checklist de qualidade: projeto/qualidade.md
       - Decisões: projeto/decisoes.md
       - Changelog: projeto/changelog.md
 

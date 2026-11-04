@@ -12,6 +12,7 @@ import {
   talk,
   deleteSave,
   loadGame,
+  planIssues,
   recordingTarget,
   saveGame,
   setActivity,
@@ -31,6 +32,7 @@ import { GoalsPanel } from './components/GoalsPanel';
 import { ShowsPanel } from './components/ShowsPanel';
 import { StoryModal, type StoryChoice } from './components/StoryModal';
 import { TopBar } from './components/TopBar';
+import { MobileActionBar } from './components/MobileActionBar';
 import { EntriesModal, WeekReportModal } from './components/WeekReportModal';
 
 // localStorage pode estar indisponível (modo privado, etc.). O jogo continua, só não salva.
@@ -95,7 +97,8 @@ export function App() {
   const choose = (id: MemberId, a: ActivityId) => setGame((g) => (g ? setActivity(g, id, a) : g));
 
   const advance = () => {
-    if (!game) return;
+    // Os botões já ficam desabilitados com o plano inválido; isto é só uma garantia.
+    if (!game || planIssues(game).length) return;
     const r = advanceWeek(game);
     setGame(r.state);
     setOverlay({ kind: 'report', report: r.report });
@@ -109,6 +112,11 @@ export function App() {
   };
 
   const closeOverlay = useCallback(() => setOverlay(null), []);
+
+  const toMenu = () => {
+    setOverlay(null);
+    setGame(null);
+  };
 
   // Um evento pendente abre sozinho assim que nada mais estiver na tela (ex.: depois do resumo).
   useEffect(() => {
@@ -128,7 +136,17 @@ export function App() {
   };
 
   if (!game) {
-    return <TitleScreen saved={saved} onContinue={() => saved && setGame(saved)} onNew={startNew} />;
+    return (
+      <TitleScreen
+        saved={saved}
+        onContinue={() => saved && setGame(saved)}
+        onNew={startNew}
+        onImport={(st) => {
+          setOverlay(null);
+          setGame(st);
+        }}
+      />
+    );
   }
 
   const unavailable: Partial<Record<ActivityId, string>> = {};
@@ -143,8 +161,8 @@ export function App() {
   const identity = bandIdentity(game);
 
   return (
-    <div className="app">
-      <TopBar state={game} onMenu={() => setGame(null)} />
+    <div className={`app ${game.finished ? '' : 'app--with-bar'}`}>
+      <TopBar state={game} onMenu={toMenu} />
       <main className="studio">
         <div className="studio__main">
           <div className="scene">
@@ -155,7 +173,7 @@ export function App() {
             </div>
           </div>
           {game.finished ? (
-            <SeasonEnd state={game} onNew={startNew} onMenu={() => setGame(null)} />
+            <SeasonEnd state={game} onNew={startNew} onMenu={toMenu} />
           ) : (
             <div className="members">
               {MEMBER_ORDER.map((id) => (
@@ -167,6 +185,7 @@ export function App() {
                   unavailable={unavailable}
                   onChoose={(a) => choose(id, a)}
                   onTalk={canTalk(game) ? () => setOverlay({ kind: 'talk', member: id }) : undefined}
+                  talkNote={game.pendingEvent ? 'Resolva o acontecimento antes' : 'Conversa da semana já feita'}
                 />
               ))}
             </div>
@@ -184,6 +203,9 @@ export function App() {
           <RelationsPanel state={game} />
         </aside>
       </main>
+      {!game.finished && (
+        <MobileActionBar state={game} onAdvance={advance} onOpenEvent={() => setOverlay(eventOverlay(game))} />
+      )}
       {overlay?.kind === 'report' && <WeekReportModal report={overlay.report} onClose={closeOverlay} />}
       {overlay?.kind === 'compose' && <ComposeModal state={game} onConfirm={confirmSong} onCancel={closeOverlay} />}
       {overlay?.kind === 'event' && (

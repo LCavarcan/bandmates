@@ -476,6 +476,108 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
 .season-end__relations summary { cursor: pointer; color: var(--ink-soft); }
 @media (max-width: 640px) { .jury li { grid-template-columns: 1fr 60px; } .jury__bar { display: none; } }
 
+/* ---------- Fase 5: toque e celular ---------- */
+.talk-note { font-size: 0.72rem; color: var(--muted); font-style: italic; text-align: right; }
+.activity--unavailable { opacity: 0.45; }
+.activity--unavailable:hover { transform: none !important; border-color: transparent !important; }
+.goal { display: flex; gap: 0.35rem; }
+.goal__hint { display: block; font-size: 0.7rem; color: var(--muted); }
+.title-screen__files { display: flex; gap: 1.2rem; flex-wrap: wrap; justify-content: center; }
+.import-error { color: var(--bad); margin: 0; max-width: 420px; }
+.mobile-bar { display: none; }
+.error-detail { max-width: 560px; white-space: pre-wrap; background: var(--bg-2); padding: 0.6rem 0.8rem; border-radius: 10px; color: var(--mid); font-size: 0.8rem; }
+
+/* Em telas de toque, "hover" gruda depois do toque: só anima onde há mouse. */
+@media (hover: none) {
+  .activity:hover, .option:hover, .story-choice:hover, .primary-btn:hover { transform: none; }
+}
+
+@media (max-width: 700px) {
+  body { font-size: 15px; }
+
+  /* Barra superior em duas linhas: marca + menu; depois recursos e calendário. */
+  .topbar {
+    display: grid; grid-template-columns: 1fr auto; grid-template-areas: 'brand menu' 'res res' 'cal cal';
+    gap: 0.45rem 0.6rem; padding: 0.55rem 0.8rem; position: static;
+  }
+  .brand { grid-area: brand; }
+  .brand__mark { width: 28px; height: 28px; font-size: 1rem; }
+  .brand__name { font-size: 1.1rem; }
+  .topbar > .ghost-btn { grid-area: menu; padding: 0.35rem 0.8rem; }
+  .resources { grid-area: res; gap: 0.35rem; }
+  .res { padding: 0.25rem 0.6rem; font-size: 0.82rem; }
+  .calendar { grid-area: cal; min-width: 0; gap: 0.5rem; }
+  .calendar__weeks { gap: 3px; flex-wrap: wrap; }
+  .week-dot { width: 12px; height: 12px; }
+
+  .studio { padding: 0.75rem 0.7rem 1.5rem; gap: 0.9rem; }
+  .app--with-bar .studio { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
+  .scene { height: 110px; }
+  .scene__caption { padding: 0.6rem 0.9rem; }
+  .scene__caption h1 { font-size: 1.05rem; }
+
+  .members { grid-template-columns: 1fr; gap: 0.8rem; }
+  .member { padding: 0.8rem; }
+  .member__portrait { width: 92px; height: 96px; }
+  .member__portrait .portrait { width: 92px; height: auto; }
+  .member__id h3 { font-size: 1.35rem; }
+  .meter { grid-template-columns: 72px 1fr 26px; }
+  .activities { gap: 0.4rem; }
+  .activity { min-height: 52px; padding: 0.5rem 0.1rem; }
+  .activity__icon { font-size: 1.3rem; }
+  .activity__name { font-size: 0.72rem; }
+  .talk-btn { padding: 0.45rem 0.9rem; font-size: 0.85rem; }
+  .link-btn { padding: 0.4rem 0; }
+
+  /* O botão de avançar mora na barra do rodapé; no painel ele some para não duplicar. */
+  .panel--plan .primary-btn { display: none; }
+  .panel { padding: 0.85rem; }
+  .song-card__stats { grid-template-columns: repeat(3, 1fr); }
+  .venue__foot { flex-wrap: wrap; }
+  .venue__foot .ghost-btn, .venue__foot .primary-btn { min-height: 40px; }
+
+  .mobile-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    padding: 0.6rem 0.8rem calc(0.6rem + env(safe-area-inset-bottom));
+    background: rgba(29, 22, 48, 0.96); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line); box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+  }
+  .mobile-bar__info { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+  .mobile-bar__issue { font-size: 0.75rem; color: var(--mid); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mobile-bar .primary-btn { flex: none; min-height: 44px; padding: 0.5rem 1.1rem; }
+
+  /* Modais em tela cheia, com o botão principal sempre visível. */
+  .overlay { padding: 0; place-items: stretch; }
+  .modal, .modal--wide, .modal--story {
+    width: 100%; max-height: none; height: 100dvh; border-radius: 0; border: 0;
+  }
+  .modal__head { padding: 0.9rem 1rem 0.7rem; }
+  .modal__head h2 { font-size: 1.5rem; }
+  .modal__body { padding: 0.8rem 1rem; flex: 1; }
+  .modal__foot { padding: 0.7rem 1rem calc(0.7rem + env(safe-area-inset-bottom)); position: sticky; bottom: 0; background: var(--panel); }
+  .modal__foot .primary-btn, .modal__foot .ghost-btn { flex: 1; min-height: 46px; }
+  .story__stage { height: 112px; }
+  .story__actor .portrait { width: 96px; height: auto; }
+  .story-choice { padding: 0.8rem 0.9rem; min-height: 52px; }
+  .log__who { width: 40px; }
+
+  .options--4, .options--3 { grid-template-columns: 1fr; }
+  .options--leaders { grid-template-columns: repeat(2, 1fr) !important; }
+  .chip-option { padding: 0.5rem 0.8rem; }
+  .field input { font-size: 1.15rem; }
+
+  .title-screen { padding: 1.2rem 0.8rem; gap: 0.8rem; }
+  .title-screen__member .portrait { width: 82px; height: auto; }
+  .title-screen__actions { flex-direction: column; width: 100%; max-width: 340px; }
+  .title-screen__actions > button { width: 100%; min-height: 48px; }
+
+  .season-end { padding: 1rem; }
+  .season-end h2 { font-size: 1.6rem; }
+  .epilogue__portrait { width: 56px; height: 60px; }
+  .epilogue__portrait .portrait { width: 56px; height: auto; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }

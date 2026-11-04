@@ -1,6 +1,6 @@
 // Teste de fumaça da interface: renderiza cada tela com estados reais de campanha.
 import { renderToString } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
 import { MEMBER_ORDER } from '../data/members';
 import { createNewGame, startSong } from '../engine';
 import { playCampaign } from '../engine/bot';
@@ -16,6 +16,8 @@ import { EntriesModal, WeekReportModal } from './components/WeekReportModal';
 import { StoryModal } from './components/StoryModal';
 import { GoalsPanel } from './components/GoalsPanel';
 import { ShowsPanel } from './components/ShowsPanel';
+import { MobileActionBar } from './components/MobileActionBar';
+import { saveFileName } from './saveFile';
 import { EVENTS } from '../data/events';
 import { StudioBackdrop } from './art/StudioBackdrop';
 
@@ -30,11 +32,28 @@ function playWeeks(n: number): { state: GameState; report: WeekReport } {
   return { state, report: reports[reports.length - 1] };
 }
 
+// Qualquer aviso do React (chaves duplicadas, props inválidas…) apareceria no console do navegador.
+let consoleError: MockInstance;
+let consoleWarn: MockInstance;
+beforeEach(() => {
+  consoleError = vi.spyOn(console, 'error');
+  consoleWarn = vi.spyOn(console, 'warn');
+});
+afterEach(() => {
+  expect(consoleError, 'console.error durante a renderização').not.toHaveBeenCalled();
+  expect(consoleWarn, 'console.warn durante a renderização').not.toHaveBeenCalled();
+  vi.restoreAllMocks();
+});
+
 describe('interface', () => {
   it('renderiza a tela de título com e sem save', () => {
-    expect(renderToString(<TitleScreen saved={null} onContinue={noop} onNew={noop} />)).toContain('Bandmates');
-    const html = renderToString(<TitleScreen saved={playWeeks(2).state} onContinue={noop} onNew={noop} />);
+    const empty = renderToString(<TitleScreen saved={null} onContinue={noop} onNew={noop} onImport={noop} />);
+    expect(empty).toContain('Bandmates');
+    expect(empty).toContain('Importar save');
+    expect(empty).not.toContain('Exportar save');
+    const html = renderToString(<TitleScreen saved={playWeeks(2).state} onContinue={noop} onNew={noop} onImport={noop} />);
     expect(html).toContain('Continuar');
+    expect(html).toContain('Exportar save');
   });
 
   it('renderiza o estúdio depois de algumas semanas', () => {
@@ -92,6 +111,28 @@ describe('interface', () => {
       );
       expect(html).toContain(e.choices[0].label.replace(/"/g, '&quot;'));
     }
+  });
+
+  it('barra do celular: avançar, problema do plano ou acontecimento pendente', () => {
+    const s = createNewGame(5);
+    expect(renderToString(<MobileActionBar state={s} onAdvance={noop} onOpenEvent={noop} />)).toContain('Avançar');
+    const blocked = { ...s, plan: { ...s.plan, lia: 'compor' as const } };
+    expect(renderToString(<MobileActionBar state={blocked} onAdvance={noop} onOpenEvent={noop} />)).toContain('Defina a nova música');
+    const pendingEv = { ...s, pendingEvent: { id: 'o_cartaz', week: 1 } };
+    expect(renderToString(<MobileActionBar state={pendingEv} onAdvance={noop} onOpenEvent={noop} />)).toContain('Acontecimento');
+  });
+
+  it('atividades bloqueadas continuam tocáveis (para mostrar o motivo no celular)', () => {
+    const s = createNewGame(5);
+    const html = renderToString(
+      <MemberCard member={s.members.lia} activity="ensaiar" disabled={false} unavailable={{ compor: 'Defina uma música.' }} onChoose={noop} talkNote="Conversa da semana já feita" />,
+    );
+    expect(html).toContain('aria-disabled="true"');
+    expect(html).toContain('Conversa da semana já feita');
+  });
+
+  it('nome do arquivo de backup indica a semana', () => {
+    expect(saveFileName({ ...createNewGame(5), week: 7 })).toMatch(/^bandmates-semana-7-\d{4}-\d{2}-\d{2}\.json$/);
   });
 
   it('renderiza o fim da temporada', () => {

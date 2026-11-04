@@ -34,5 +34,5 @@ export {
 export type { Epilogue } from './shows';
 export { bandUnity } from './narrative';
 export { activityMultiplier, describeModifier, evaluate } from './narrative';
-export { saveGame, loadGame, deleteSave, serialize, deserialize } from './save';
+export { saveGame, loadGame, deleteSave, serialize, deserialize, isValidState } from './save';
 export type { KeyValueStore } from './save';

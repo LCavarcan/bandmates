@@ -37,12 +37,24 @@
 - [x] Arco romântico opcional entre Lia e Nina: sinais dos dois lados, vulnerabilidade, decisão, reciprocidade, amizade como final válido.
 - [x] Final com resultado, epílogo por integrante e epílogo do arco.
 
-## ⏳ Fase 5: persistência e polimento
+## ✅ Fase 5: persistência e polimento
 
-- [ ] Refino de interface e retratos.
-- [ ] Mais testes e correções.
-- [ ] Executável para Windows (ferramenta gratuita, a avaliar).
-- [ ] Instruções de distribuição.
+- [x] Layout para celular: coluna única, barra de ação no rodapé, modais em tela cheia, áreas de toque maiores.
+- [x] Dicas visíveis no toque (antes só apareciam ao passar o mouse).
+- [x] Backup do save: exportar e importar arquivo.
+- [x] Validação estrutural de saves e proteção contra erros de renderização.
+- [x] Testes falham com avisos do React no console.
+- [x] Distribuição: `Bandmates.html` em arquivo único, offline, com verificação de URLs externas.
+- [x] `npm run dev:rede` para jogar no celular pela rede local.
+- [x] Checklist de qualidade.
+
+## Próximos passos possíveis
+
+- [ ] Teste manual completo no PC e no celular (veja o [Checklist de qualidade](qualidade.md)).
+- [ ] Arte definitiva dos retratos (a interface já está pronta para trocar).
+- [ ] Efeitos sonoros opcionais (licença permissiva).
+- [ ] Mais eventos e um segundo arco romântico.
+- [ ] Executável `.exe` (Electron ou Tauri), se o arquivo único não bastar.
 
 ## Fora do MVP
 

@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.5.0 — Fase 5: persistência e polimento
+
+### Novo
+
+- **Layout para celular:** barra superior compacta, cartas em coluna única, barra de ação fixa no rodapé, modais em tela cheia, áreas de toque maiores.
+- **Dicas no toque:** tocar numa atividade bloqueada mostra o motivo na carta; o botão de conversa indisponível explica por quê; as metas mostram a dica na tela.
+- **Backup do save:** exportar e importar arquivo `.json` pela tela de título.
+- **`Bandmates.html`:** o jogo num arquivo único (`npm run build:arquivo`), que abre com dois cliques e funciona offline.
+- **`npm run dev:rede`** para jogar no celular pela rede local.
+- **Proteção contra erros:** em vez de tela em branco, há opções para tentar de novo, baixar o save ou recomeçar.
+- Página **Checklist de qualidade** na documentação.
+
+### Corrigido
+
+- Saves estruturalmente inválidos (por exemplo, um arquivo editado à mão) eram aceitos e podiam quebrar a interface. Agora são recusados.
+- Chaves de React duplicadas possíveis nas mudanças de recursos de um mesmo evento.
+- Voltar ao menu com um modal aberto deixava o estado do modal pendurado.
+- Efeitos de `hover` "grudavam" em telas de toque.
+
 ## 0.4.0 — Fase 4: campanha
 
 ### Novo

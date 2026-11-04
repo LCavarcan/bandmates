@@ -32,9 +32,13 @@ src/
     labels.ts          rótulos de interface
   ui/
     App.tsx            orquestra o estado e os modais
+    ErrorBoundary.tsx  saída segura se a renderização falhar
+    saveFile.ts        exportar/importar o save como arquivo
     art/               retratos e cenário em SVG (substituíveis)
     components/        telas e painéis
-    styles.css         identidade visual
+    styles.css         identidade visual (inclui o layout para celular, ≤ 700px)
+scripts/
+  build-arquivo.mjs    empacota dist/ num único Bandmates.html e confere se não há URL externa
 ```
 
 ## Princípios

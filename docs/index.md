@@ -12,13 +12,14 @@ O jogo roda localmente e offline. Não precisa de conta e não tem custo nenhum.
 | 2. Ciclo musical | Composição com escolhas, gravação, lançamento, streaming, fãs/dinheiro/reputação | ✅ Concluída |
 | 3. Personagens e relações | Eventos condicionais com escolhas, continuações, conversas, consequências nas ações musicais | ✅ Concluída |
 | 4. Campanha | Shows, metas, seletiva do festival, arco romântico opcional, epílogos | ✅ Concluída |
-| 5. Persistência e polimento | Refino visual, testes extras, distribuição | ⏳ Próxima |
+| 5. Persistência e polimento | Layout para celular, backup do save, arquivo único offline, validação, proteção contra erros | ✅ Concluída |
 
 Veja o [roadmap](projeto/roadmap.md) e o [changelog](projeto/changelog.md).
 
 ## Por onde começar
 
-- **Quer jogar?** Veja [Como executar](executar.md).
+- **Quer jogar?** Rode `npm run build:arquivo` e abra `dist-arquivo/Bandmates.html`. Veja [Como executar](executar.md).
+- **O que foi testado?** Veja o [Checklist de qualidade](projeto/qualidade.md).
 - **Quer entender o design?** Comece em [Visão e pilares](design/visao.md) e [Personagens](design/personagens.md).
 - **Quer balancear?** As fórmulas estão em [Mecânicas](mecanicas/semana.md).
 - **Quer mexer no código?** Veja [Arquitetura](dev/arquitetura.md).

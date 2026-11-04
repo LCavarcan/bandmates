@@ -16,6 +16,18 @@ O save fica em `localStorage`, na chave `bandmates.save`:
 
 O jogo salva automaticamente a cada mudança de estado. O armazenamento é acessado pela interface mínima `KeyValueStore`; nos testes, ela é substituída por um mapa em memória.
 
+## Validação
+
+Todo save carregado (do navegador ou de arquivo importado) passa por `isValidState`, que confere tipos, as quatro integrantes, os seis pares de relação e as listas obrigatórias. Um save inválido é recusado, e o jogo oferece começar de novo, em vez de quebrar.
+
+## Backup em arquivo
+
+Na tela de título, **Exportar save** baixa o mesmo JSON do `localStorage`, e **Importar save** o carrega, passando pela migração e pela validação. Veja `src/ui/saveFile.ts`.
+
+## Se algo quebrar
+
+`ErrorBoundary` (`src/ui/ErrorBoundary.tsx`) captura erros de renderização e oferece: tentar de novo, baixar o save bruto para investigar, ou apagar o save e recomeçar.
+
 ## Versões
 
 | Versão | Mudança |

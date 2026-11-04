@@ -203,6 +203,20 @@ describe('salvamento', () => {
     expect(loadGame(store)).toEqual(s);
   });
 
+  it('rejeita saves estruturalmente incompletos (ex.: arquivo importado editado à mão)', () => {
+    const raw = JSON.parse(serialize(createNewGame(SEED)));
+    delete raw.state.members.nina;
+    expect(deserialize(JSON.stringify(raw))).toBeNull();
+    const raw2 = JSON.parse(serialize(createNewGame(SEED)));
+    raw2.state.songs = 'nada';
+    expect(deserialize(JSON.stringify(raw2))).toBeNull();
+    const raw3 = JSON.parse(serialize(createNewGame(SEED)));
+    raw3.state.money = 'muito';
+    expect(deserialize(JSON.stringify(raw3))).toBeNull();
+    expect(deserialize(JSON.stringify({ version: 4 }))).toBeNull();
+    expect(deserialize('null')).toBeNull();
+  });
+
   it('rejeita saves corrompidos ou de versão desconhecida', () => {
     expect(deserialize('não é json')).toBeNull();
     const raw = JSON.parse(serialize(createNewGame(SEED)));

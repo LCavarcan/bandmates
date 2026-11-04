@@ -3,9 +3,15 @@
 Simulador de gerenciamento de banda com narrativa e relações. Feito com TypeScript, React e Vite.
 Roda localmente e offline. Não precisa de conta e não tem nenhum custo.
 
-**Versão 0.4.0:** MVP jogável do início ao fim — Fases 1 a 4 concluídas (estrutura, ciclo musical, personagens e eventos, campanha com shows, festival, romance opcional e epílogos).
+**Versão 0.5.0:** MVP completo — Fases 1 a 5 concluídas (estrutura, ciclo musical, personagens e eventos, campanha com festival e romance opcional, polimento com layout para celular e distribuição em arquivo único).
 
-## Jogar no Windows
+## Jogar
+
+**Arquivo único (mais fácil):** `npm run build:arquivo` gera `dist-arquivo/Bandmates.html`, que abre com dois cliques e funciona offline.
+
+**No celular:** `npm run dev:rede` e abra no celular o endereço "Network" mostrado (mesmo Wi‑Fi).
+
+## Modo de desenvolvimento no Windows
 
 **Pré-requisito (apenas uma vez):** instalar o [Node.js LTS](https://nodejs.org/), que é gratuito.
 
@@ -23,7 +29,9 @@ Depois, abra **http://localhost:5173** no navegador. Para encerrar, pressione `C
 |---|---|
 | `npm run dev` | Inicia o jogo |
 | `npm test` | Roda os testes (Vitest) |
+| `npm run dev:rede` | Inicia o jogo acessível pela rede local (celular) |
 | `npm run build` | Checa os tipos e gera a versão otimizada em `dist/` |
+| `npm run build:arquivo` | Gera `dist-arquivo/Bandmates.html` (arquivo único, offline) |
 | `npm run docs` | Gera a documentação em `site/` (requer o ambiente Python, veja abaixo) |
 
 ## Documentação

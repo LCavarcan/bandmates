@@ -141,7 +141,7 @@ export function ComposeModal({ state, onConfirm, onCancel }: Props) {
 
           <fieldset>
             <legend>Quem lidera a composição</legend>
-            <div className="options options--4">
+            <div className="options options--4 options--leaders">
               {MEMBER_ORDER.map((id) => {
                 const p = MEMBERS[id];
                 const m = state.members[id];

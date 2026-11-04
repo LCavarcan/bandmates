@@ -21,7 +21,11 @@ export function GoalsPanel({ state }: { state: GameState }) {
       <ul className="goals">
         {goals.map((g) => (
           <li key={g.id} className={g.done ? 'goal goal--done' : 'goal'} title={g.hint}>
-            <span aria-hidden="true">{g.done ? '✅' : '⬜'}</span> {g.label}
+            <span aria-hidden="true">{g.done ? '✅' : '⬜'}</span>
+            <span>
+              {g.label}
+              {!g.done && <span className="goal__hint">{g.hint}</span>}
+            </span>
           </li>
         ))}
       </ul>

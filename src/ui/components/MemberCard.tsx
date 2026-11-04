@@ -16,12 +16,16 @@ interface Props {
   onChoose: (a: ActivityId) => void;
   /** Ausente = conversa indisponível nesta semana. */
   onTalk?: () => void;
+  /** Por que a conversa está indisponível (mostrado no lugar do botão). */
+  talkNote?: string;
 }
 
-export function MemberCard({ member, activity, disabled, unavailable = {}, onChoose, onTalk }: Props) {
+export function MemberCard({ member, activity, disabled, unavailable = {}, onChoose, onTalk, talkNote }: Props) {
   const p = MEMBERS[member.id];
   const mood = moodOf(member);
   const [showProfile, setShowProfile] = useState(false);
+  // Aviso de toque: no celular não há "passar o mouse", então o motivo do bloqueio aparece na carta.
+  const [notice, setNotice] = useState<string | null>(null);
   const traits = (Object.entries(p.traits) as [TraitKey, number][]).filter(([, v]) => v >= 60);
   const burnt = member.emotions.estresse >= BURNOUT_STRESS;
 
@@ -74,14 +78,13 @@ export function MemberCard({ member, activity, disabled, unavailable = {}, onCho
         <button className="link-btn" onClick={() => setShowProfile((v) => !v)}>
           {showProfile ? '← Ver atributos' : 'Conhecer ' + p.name + ' →'}
         </button>
-        <button
-          className="talk-btn"
-          onClick={onTalk}
-          disabled={!onTalk}
-          title={onTalk ? `Conversar com ${p.name} (uma conversa por semana)` : 'Você já conversou com alguém nesta semana.'}
-        >
-          💬 Conversar
-        </button>
+        {onTalk ? (
+          <button className="talk-btn" onClick={onTalk} title={`Conversar com ${p.name} (uma conversa por semana)`}>
+            💬 Conversar
+          </button>
+        ) : (
+          <span className="talk-note">{talkNote ?? 'Sem conversa agora'}</span>
+        )}
       </div>
 
       <div className="activities" role="radiogroup" aria-label={`Atividade de ${p.name}`}>
@@ -94,9 +97,17 @@ export function MemberCard({ member, activity, disabled, unavailable = {}, onCho
               key={id}
               role="radio"
               aria-checked={selected}
-              disabled={disabled || (!!blocked && !selected)}
-              className={`activity ${selected ? 'activity--on' : ''} ${blocked && selected ? 'activity--blocked' : ''}`}
-              onClick={() => onChoose(id)}
+              disabled={disabled}
+              aria-disabled={!!blocked && !selected}
+              className={`activity ${selected ? 'activity--on' : ''} ${blocked ? (selected ? 'activity--blocked' : 'activity--unavailable') : ''}`}
+              onClick={() => {
+                if (blocked && !selected) {
+                  setNotice(`${a.icon} ${a.name}: ${blocked}`);
+                } else {
+                  setNotice(null);
+                  onChoose(id);
+                }
+              }}
               title={blocked ?? a.description}
             >
               <span className="activity__icon" aria-hidden="true">{a.icon}</span>
@@ -106,8 +117,8 @@ export function MemberCard({ member, activity, disabled, unavailable = {}, onCho
         })}
       </div>
       {activity === 'show' && <p className="activity-show">🎤 No palco com a banda nesta semana</p>}
-      <p className={`activity-hint ${unavailable[activity] ? 'activity-hint--warn' : ''}`}>
-        {unavailable[activity] ?? ACTIVITIES[activity].description}
+      <p className={`activity-hint ${notice || unavailable[activity] ? 'activity-hint--warn' : ''}`} aria-live="polite">
+        {notice ?? unavailable[activity] ?? ACTIVITIES[activity].description}
       </p>
     </article>
   );

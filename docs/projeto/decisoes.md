@@ -62,3 +62,18 @@ Registro curto das decisões de design e de técnica que não estavam especifica
 | Reciprocidade testada no momento da declaração | "Não transforme uma relação em romance só porque um número passou de um limite": é preciso passar pelas cenas, e a resposta pode ser não |
 | A amizade tem epílogo próprio | Final válido, não "fracasso" |
 | Continuações e eventos disputam por prioridade | A *Véspera* (prioridade 10) nunca é atropelada; uma continuação que perde volta na semana seguinte |
+
+## Fase 5
+
+| Decisão | Motivo |
+|---|---|
+| Distribuir como **um único HTML** em vez de um `.exe` | Zero dependências novas, cerca de 400 KB, abre com dois cliques, funciona offline em qualquer sistema. Electron adicionaria cerca de 100 MB por cópia; Tauri exigiria a toolchain de Rust. Ambos continuam possíveis depois |
+| Script próprio para embutir JS e CSS (sem plugin) | Poucas linhas, sem dependência; aproveita para conferir URLs externas |
+| Breakpoint único para celular (700px) | Simples de manter; o layout de tablet já é coberto pelo breakpoint de 1100px |
+| Barra de ação fixa no rodapé do celular | O botão de avançar fica sempre ao alcance do polegar, sem rolar até o painel do plano |
+| Atividades bloqueadas **tocáveis**, mostrando o motivo | No toque não existe "passar o mouse": um botão só desabilitado não explica nada |
+| Animações de `hover` só onde há mouse (`hover: hover`) | No toque, o efeito "gruda" depois de tocar |
+| Validação estrutural de saves | Arquivos importados podem vir editados ou corrompidos; o melhor é recusar do que quebrar |
+| `ErrorBoundary` com download do save bruto | Se algo quebrar, a jogadora não perde a campanha e pode mandar o arquivo para investigação |
+| Testes de interface falham com `console.error` e `console.warn` | Aproxima o critério "sem erros no console" sem precisar de navegador |
+| Nenhuma alteração nos retratos | Mudanças visuais sem poder ver o resultado arriscam regressões; a arte definitiva deve substituir os SVGs |
